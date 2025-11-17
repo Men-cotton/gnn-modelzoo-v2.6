@@ -12,7 +12,7 @@ from cerebras.modelzoo.config import ModelConfig
 from cerebras.pytorch.metrics import AccuracyMetric
 from typing_extensions import Annotated
 
-from .architectures import GCN, GraphSAGE
+from .architectures import GCN, GraphSAGE, GraphTransformer
 from .batches import GraphSAGEBatch
 from .pipelines.common import EdgeIndexAdjacency
 
@@ -53,11 +53,16 @@ class GNNModelConfig(GNNArchConfig):
     disable_log_softmax: bool = False
     compute_eval_metrics: bool = True
 
-    core_architecture: Literal["GCN", "GraphSAGE"] = "GCN"
+    core_architecture: Literal["GCN", "GraphSAGE", "GraphTransformer"] = "GCN"
     graphsage_hidden_dim: int = 128
     graphsage_num_layers: int = 2
     graphsage_dropout: Annotated[float, Ge(0), Le(1)] = 0.5
     graphsage_aggregator: Literal["mean", "sum", "max"] = "mean"
+
+    # GraphTransformer specific parameters
+    gt_num_layers: int = 2
+    gt_heads: int = 4
+    gt_dropout: Annotated[float, Ge(0), Le(1)] = 0.5
 
     @property
     def __model_cls__(self):
@@ -111,6 +116,16 @@ class GNNModel(nn.Module):
                 aggregator=model_config.graphsage_aggregator,
                 num_classes=model_config.n_class,
             )
+        elif architecture == "graphtransformer":
+            core = GraphTransformer(
+                in_dim=model_config.n_feat,
+                hidden_dim=model_config.n_hid,
+                num_layers=model_config.gt_num_layers,
+                num_classes=model_config.n_class,
+                heads=model_config.gt_heads,
+                dropout=model_config.gt_dropout,
+                aggregator=model_config.graphsage_aggregator,
+            )
         else:
             raise ValueError(
                 f"Unsupported core architecture '{model_config.core_architecture}'."
@@ -154,20 +169,27 @@ class GNNModel(nn.Module):
             labels = batch.labels
             mask = batch.target_mask.to(torch.bool)
         else:
+            # This path is for full-graph training, which is not supported by the new GraphTransformer.
+            # The GCN model is the only model that uses this path.
             (features, adjacency), (labels, mask) = batch
-            if self.config.core_architecture.lower() == "gcn":
-                if cstorch.use_cs() and features.dim() == 3 and features.size(0) == 1:
-                    features_for_model = features.squeeze(0)
-                else:
-                    features_for_model = features
-                if features_for_model.dtype != torch.float32:
-                    features_for_model = features_for_model.to(torch.float32)
+            if self.config.core_architecture.lower() != "gcn":
+                raise ValueError(
+                    f"Full-graph training is only supported for GCN. "
+                    f"Got {self.config.core_architecture}."
+                )
+
+            if cstorch.use_cs() and features.dim() == 3 and features.size(0) == 1:
+                features_for_model = features.squeeze(0)
             else:
                 features_for_model = features
+            if features_for_model.dtype != torch.float32:
+                features_for_model = features_for_model.to(torch.float32)
+
             logits = self.model(features_for_model, adjacency)
-            if self.config.core_architecture.lower() == "gcn":
-                if logits.dtype != torch.float32:
-                    logits = logits.to(torch.float32)
+
+            if logits.dtype != torch.float32:
+                logits = logits.to(torch.float32)
+
             if mask.dim() == 2 and mask.size(0) == 1:
                 mask = mask.squeeze(0)
             mask = mask.to(torch.bool)
