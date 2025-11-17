@@ -7,6 +7,11 @@ models:
   data_processor_paths:
   - cerebras.modelzoo.models.gnn.data.GNNDataProcessor
 
+- name: gatv2
+  path: cerebras.modelzoo.models.gnn.model.GNNModel
+  data_processor_paths:
+  - cerebras.modelzoo.models.gnn.data.GNNDataProcessor
+
 - name: graphsage
   path: cerebras.modelzoo.models.gnn.model.GraphSAGEModel
   data_processor_paths:

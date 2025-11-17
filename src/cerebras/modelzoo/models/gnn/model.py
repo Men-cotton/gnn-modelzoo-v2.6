@@ -12,7 +12,7 @@ from cerebras.modelzoo.config import ModelConfig
 from cerebras.pytorch.metrics import AccuracyMetric
 from typing_extensions import Annotated
 
-from .architectures import GCN, GraphSAGE
+from .architectures import GATv2, GCN, GraphSAGE
 from .batches import GraphSAGEBatch
 from .pipelines.common import EdgeIndexAdjacency
 
@@ -53,7 +53,8 @@ class GNNModelConfig(GNNArchConfig):
     disable_log_softmax: bool = False
     compute_eval_metrics: bool = True
 
-    core_architecture: Literal["GCN", "GraphSAGE"] = "GCN"
+    core_architecture: Literal["GCN", "GraphSAGE", "GATv2"] = "GCN"
+    gatv2_num_heads: int = 8
     graphsage_hidden_dim: int = 128
     graphsage_num_layers: int = 2
     graphsage_dropout: Annotated[float, Ge(0), Le(1)] = 0.5
@@ -110,6 +111,19 @@ class GNNModel(nn.Module):
                 dropout=model_config.graphsage_dropout,
                 aggregator=model_config.graphsage_aggregator,
                 num_classes=model_config.n_class,
+            )
+        elif architecture == "gatv2":
+            activation_hidden = _ACTIVATION_FN_MAP[model_config.activation_fn_hidden]()
+            activation_output = _ACTIVATION_FN_MAP[model_config.activation_fn_output]()
+            core = GATv2(
+                in_dim=model_config.n_feat,
+                hidden_dim=model_config.n_hid,
+                num_classes=model_config.n_class,
+                num_heads=model_config.gatv2_num_heads,
+                dropout_rate=model_config.dropout_rate,
+                activation_hidden=activation_hidden,
+                activation_output=activation_output,
+                use_bias=model_config.use_bias,
             )
         else:
             raise ValueError(
