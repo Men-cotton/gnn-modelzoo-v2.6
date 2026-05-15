@@ -1,6 +1,6 @@
 trainer:
   init:
-    model_dir: ./src/cerebras/modelzoo/models/gnn/docs/artifacts/runtime/model_dirs/mag240m_graphsage
+    model_dir: "$MODELZOO_ROOT/models/gnn/docs/artifacts/runtime/model_dirs/mag240m_graphsage"
     seed: 42
     model:
       name: graphsage
@@ -43,7 +43,7 @@ trainer:
       dataset_profiles: &mag240m_dataset
         mag240m:
           dataset_name: MAG240M
-          data_dir: "$MODELZOO_ROOT/../../../data/gnn/datasets"
+          data_dir: "$MODELZOO_ROOT/models/gnn/data/datasets"
           sampling_mode: neighbor
           fanouts: [15, 10, 5]
           pad_node_id: 0
