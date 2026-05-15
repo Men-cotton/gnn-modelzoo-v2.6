@@ -14,7 +14,6 @@ from cerebras.modelzoo.common.input_utils import get_streaming_batch_size
 from cerebras.modelzoo.common.pytorch_utils import SampleGenerator
 from cerebras.modelzoo.models.gnn.worker_validation import validate_num_workers
 
-from ..batches import FullGraphBatch
 from ..runtime.csx import to_dense_adjacency
 from ..runtime.torch import to_edge_adjacency
 from ..sources.base import (
@@ -24,6 +23,21 @@ from ..sources.base import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+def _full_graph_payload(
+    *,
+    features: Tensor,
+    adjacency: Union[EdgeIndexAdjacency, Tensor],
+    labels: Tensor,
+    mask: Tensor,
+):
+    return {
+        "features": features,
+        "adjacency": adjacency,
+        "labels": labels,
+        "target_mask": mask,
+    }
 
 
 class _SingleGraphDataset(Dataset):
@@ -37,11 +51,11 @@ class _SingleGraphDataset(Dataset):
         mask: Tensor,
     ):
         super().__init__()
-        self._data = FullGraphBatch(
+        self._data = _full_graph_payload(
             features=features,
             adjacency=adjacency,
             labels=labels,
-            target_mask=mask,
+            mask=mask,
         )
 
     def __len__(self) -> int:
@@ -159,11 +173,11 @@ class FullGraphDataProcessor(BaseGraphDataSource):
             fake_adj = to_edge_adjacency(fake_edge_index, fake_edge_weight)
 
         return SampleGenerator(
-            data=FullGraphBatch(
+            data=_full_graph_payload(
                 features=fake_features,
                 adjacency=fake_adj,
                 labels=fake_labels,
-                target_mask=fake_mask,
+                mask=fake_mask,
             ),
             sample_count=sample_count,
         )
