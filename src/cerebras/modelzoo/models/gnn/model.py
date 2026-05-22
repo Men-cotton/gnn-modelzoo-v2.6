@@ -9,6 +9,12 @@ from .task.wrapper import GNNTaskWrapper
 logger = logging.getLogger(__name__)
 
 
+class GATv2Model(GNNTaskWrapper):
+    """Alias model registered separately for GATv2 experiments."""
+
+    pass
+
+
 class GCNModel(GNNTaskWrapper):
     """Alias model registered separately for GCN experiments."""
 
@@ -23,6 +29,7 @@ class GraphSAGEModel(GNNTaskWrapper):
 
 __all__ = [
     "FullGraphBatch",
+    "GATv2Model",
     "GCNModel",
     "GNNArchConfig",
     "GNNModelConfig",
