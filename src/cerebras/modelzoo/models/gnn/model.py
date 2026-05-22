@@ -2,17 +2,9 @@ from __future__ import annotations
 
 import logging
 
-from cerebras.modelzoo.trainer.callbacks import register_global_callback
-
-from .callbacks.compute_time import ComputeTimeCallback
 from .data_processing.batches import FullGraphBatch, GraphSAGEBatch
 from .task.config import GNNArchConfig, GNNModelConfig
 from .task.wrapper import GNNTaskWrapper
-
-# Register compute time callback globally once (module-level).
-# This preserves the legacy import side effect while callbacks own the code.
-_COMPUTE_TIME_CB = ComputeTimeCallback()
-register_global_callback(_COMPUTE_TIME_CB)
 
 logger = logging.getLogger(__name__)
 
