@@ -47,7 +47,14 @@ class GNNTaskWrapper(nn.Module):
 
     def build_model(self, model_config: GNNModelConfig) -> nn.Module:
         architecture_config = model_config.architecture_config
-        if isinstance(architecture_config, (GCNConfig, GCNSparseMatMulConfig)):
+        if isinstance(architecture_config, GCNSparseMatMulConfig):
+            raise NotImplementedError(
+                "gcn_sparse_matmul is unsupported: the PubMed full-graph GCN "
+                "mapping emits cirh.SparseMatMul with graph nodes as the sparse "
+                "dimension, which does not lower to WAF on CSX and is "
+                "impractical on CPU."
+            )
+        if isinstance(architecture_config, GCNConfig):
             activation_hidden = _ACTIVATION_FN_MAP[
                 architecture_config.activation_fn_hidden
             ]()

@@ -43,3 +43,25 @@ expert selection use case and graph adjacency propagation. Keeping a dedicated
 GCN sparse-matmul implementation would add an alternate data format and model
 registration without a runnable local verification path, so the implementation
 was removed.
+
+A CSX compile attempt reached model compilation, but failed before execution
+with the same operator shape:
+
+```bash
+uv run cszoo fit configs/params_gcn_sparse_matmul_pubmed.yaml --target_device CSX
+```
+
+The compiler repeatedly reported:
+
+```text
+Failed to convert op to WAF (likely no corresponding kernel available):
+%66 = cirh.SparseMatMul ...
+(tensor<19717x172x1xf16>, tensor<19717x172xi64>, tensor<64x19717x1xf16>)
+  -> tensor<19717x172x64xf16>
+```
+
+This confirms that the current PubMed GCN mapping is not just missing a local
+CPU validation path; the generated CSX op is not supported by the WAF lowering
+pipeline either. The practical conclusion is that `F.sparse_matmul` should not
+be used as the full-graph GCN adjacency propagation primitive for this shape
+unless the compiler/runtime gains a kernel for this layout.
