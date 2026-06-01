@@ -3,7 +3,6 @@ from __future__ import annotations
 from contextlib import nullcontext
 from typing import Dict
 
-import cerebras.pytorch as cstorch
 from cerebras.pytorch.nn.functional import sparse_matmul
 import torch
 import torch.nn as nn
@@ -115,9 +114,8 @@ class GCNSparseMatMulLayer(nn.Module):
                 f"{indices.size(0)} vs {num_nodes}."
             )
 
-        index_dtype = torch.int32 if cstorch.use_cs() else torch.long
         return (
-            indices.to(device=device, dtype=index_dtype),
+            indices.to(device=device, dtype=torch.long),
             values.to(device=device, dtype=dtype),
         )
 
