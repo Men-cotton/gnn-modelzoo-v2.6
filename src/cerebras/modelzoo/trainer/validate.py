@@ -78,7 +78,23 @@ def construct_trainer_config(model_name: str):
     from cerebras.pytorch.optim.optimizer import ParamsT
 
     discriminator_key = "__name__"
-    discriminator = Discriminator(lambda d: d.pop(discriminator_key).lower())
+
+    def get_discriminator_value(value):
+        if isinstance(value, dict):
+            return value.pop(discriminator_key).lower()
+
+        if isinstance(value, BaseConfig):
+            orig_class = value.get_orig_class()
+            if orig_class is not None:
+                return orig_class.__name__.lower()
+
+        orig_class = getattr(value, "__orig_class__", None)
+        if orig_class is not None:
+            return orig_class.__name__.lower()
+
+        return value.__class__.__name__.lower()
+
+    discriminator = Discriminator(get_discriminator_value)
 
     def unpack(d: dict, name: str, allow_list=False):
         if isinstance(d, (list, tuple)):

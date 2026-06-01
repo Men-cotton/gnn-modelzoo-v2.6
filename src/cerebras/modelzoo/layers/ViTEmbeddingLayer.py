@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Tuple
+
 import torch
 from torch import nn
 
@@ -30,7 +32,7 @@ class InterpolatePositionEmbeddingConfig(BaseConfig):
     interpolate_offset: float = 0.1
     "Historical kludge: add a small number to avoid floating point error in the interpolation, see https://github.com/facebookresearch/dino/issues/8"
 
-    local_patch_dims: [int, int] = [7, 7]
+    local_patch_dims: Tuple[int, int] = (7, 7)
     "Local crop patch dimensions"
 
 
