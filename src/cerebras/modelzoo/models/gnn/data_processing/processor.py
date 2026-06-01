@@ -54,6 +54,8 @@ class GNNDataProcessorConfig(DataConfig):
     adj_normalization: Optional[str] = (
         None  # Defaults to None (raw adjacency) unless specified (e.g. "gcn")
     )
+    adjacency_format: Literal["auto", "dense", "edge_index", "sparse_matmul"] = "auto"
+    sparse_matmul_max_degree: Optional[int] = None
 
     # Fake data support (full-graph only, retained for parity with legacy config)
     use_fake_data: bool = False
@@ -203,6 +205,8 @@ class GNNDataProcessor:
                 float_dtype=self.float_dtype,
                 label_dtype=self.label_dtype,
                 adj_normalization_fn=self.adj_normalization_fn,
+                adjacency_format=self.config.adjacency_format,
+                sparse_matmul_max_degree=self.config.sparse_matmul_max_degree,
                 drop_last=self.config.drop_last,
                 num_workers=self.config.num_workers,
             )

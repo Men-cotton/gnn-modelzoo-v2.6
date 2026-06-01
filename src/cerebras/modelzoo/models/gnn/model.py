@@ -21,6 +21,12 @@ class GCNModel(GNNTaskWrapper):
     pass
 
 
+class GCNSparseMatMulModel(GNNTaskWrapper):
+    """Alias model registered separately for sparse_matmul GCN experiments."""
+
+    pass
+
+
 class GraphSAGEModel(GNNTaskWrapper):
     """Alias model registered separately for GraphSAGE experiments."""
 
@@ -31,6 +37,7 @@ __all__ = [
     "FullGraphBatch",
     "GATv2Model",
     "GCNModel",
+    "GCNSparseMatMulModel",
     "GNNArchConfig",
     "GNNModelConfig",
     "GraphSAGEBatch",

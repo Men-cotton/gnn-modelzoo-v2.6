@@ -86,6 +86,56 @@ def sparse_scipy_to_edge_tensors(
     return indices, values
 
 
+def sparse_scipy_to_sparse_matmul_tensors(
+    sp_matrix: sp.spmatrix,
+    *,
+    dtype: torch.dtype,
+    max_degree: Optional[int] = None,
+) -> Dict[str, torch.Tensor]:
+    """Converts a SciPy sparse adjacency into fixed slots for cstorch sparse_matmul."""
+    if sp_matrix.shape[0] != sp_matrix.shape[1]:
+        raise ValueError(
+            f"SparseMatMul adjacency must be square; received shape {sp_matrix.shape}."
+        )
+    num_nodes = sp_matrix.shape[0]
+    if num_nodes >= 2**16:
+        raise ValueError(
+            "cstorch sparse_matmul requires node indices to fit in uint16; "
+            f"received {num_nodes} nodes."
+        )
+
+    csr = sp_matrix.tocsr()
+    degrees = np.diff(csr.indptr)
+    required_degree = int(degrees.max(initial=0))
+    if max_degree is None:
+        fanout = max(required_degree, 1)
+    else:
+        fanout = int(max_degree)
+        if fanout <= 0:
+            raise ValueError("sparse_matmul_max_degree must be positive.")
+        if required_degree > fanout:
+            raise ValueError(
+                "sparse_matmul_max_degree is too small for this graph: "
+                f"required {required_degree}, got {fanout}."
+            )
+
+    indices = np.zeros((num_nodes, fanout), dtype=np.int64)
+    values = np.zeros((num_nodes, fanout), dtype=np.float32)
+    for row in range(num_nodes):
+        start = csr.indptr[row]
+        end = csr.indptr[row + 1]
+        degree = end - start
+        if degree == 0:
+            continue
+        indices[row, :degree] = csr.indices[start:end]
+        values[row, :degree] = csr.data[start:end]
+
+    return {
+        "indices": torch.from_numpy(indices),
+        "values": torch.from_numpy(values).to(dtype=dtype),
+    }
+
+
 class BaseGraphDataSource:
     """Common utilities for loading and transforming graph datasets."""
 
@@ -97,6 +147,8 @@ class BaseGraphDataSource:
         float_dtype: torch.dtype,
         label_dtype: torch.dtype,
         adj_normalization_fn: Optional[Callable[[sp.spmatrix, bool], sp.spmatrix]],
+        adjacency_format: str = "auto",
+        sparse_matmul_max_degree: Optional[int] = None,
     ):
         self.dataset_name = dataset_name
         self.data_dir = data_dir
@@ -104,6 +156,8 @@ class BaseGraphDataSource:
         self.float_dtype = float_dtype
         self.label_dtype = label_dtype
         self.adj_normalization_fn = adj_normalization_fn
+        self.adjacency_format = adjacency_format
+        self.sparse_matmul_max_degree = sparse_matmul_max_degree
         self._graph_data_cache: Optional[PyGData] = None
 
     def _requires_materialized_undirected_edges(self) -> bool:
@@ -403,18 +457,36 @@ class BaseGraphDataSource:
             edge_weight.numel(),
             mask.sum().item(),
         )
-        if cstorch.use_cs():
+        adjacency_format = self.adjacency_format
+        if adjacency_format == "auto":
+            adjacency_format = "dense" if cstorch.use_cs() else "edge_index"
+
+        if adjacency_format == "dense":
             adjacency = to_dense_adjacency(
                 edge_index,
                 edge_weight,
                 num_nodes=num_nodes,
                 dtype=self.float_dtype,
             )
+        elif adjacency_format == "edge_index":
+            adjacency = to_edge_adjacency(edge_index, edge_weight)
+        elif adjacency_format == "sparse_matmul":
+            adjacency = sparse_scipy_to_sparse_matmul_tensors(
+                adj_processed_sp,
+                dtype=self.float_dtype,
+                max_degree=self.sparse_matmul_max_degree,
+            )
+        else:
+            raise ValueError(f"Unsupported adjacency_format '{self.adjacency_format}'.")
+
+        if cstorch.use_cs():
             features = features.unsqueeze(0)
             labels = labels.unsqueeze(0)
             mask = mask.unsqueeze(0)
-        else:
-            adjacency = to_edge_adjacency(edge_index, edge_weight)
+            if isinstance(adjacency, dict):
+                adjacency = {
+                    key: tensor.unsqueeze(0) for key, tensor in adjacency.items()
+                }
 
         return features, adjacency, labels, mask
 
@@ -463,6 +535,7 @@ __all__ = [
     "BaseGraphDataSource",
     "EdgeIndexAdjacency",
     "normalize_adj_gcn",
+    "sparse_scipy_to_sparse_matmul_tensors",
     "sparse_scipy_to_torch_coo",
     "sparse_scipy_to_edge_tensors",
 ]

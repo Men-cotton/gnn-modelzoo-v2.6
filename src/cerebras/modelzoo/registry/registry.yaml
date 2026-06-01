@@ -12,6 +12,11 @@ models:
   data_processor_paths:
   - cerebras.modelzoo.models.gnn.data_processing.GNNDataProcessor
 
+- name: gcn_sparse_matmul
+  path: cerebras.modelzoo.models.gnn.model.GCNSparseMatMulModel
+  data_processor_paths:
+  - cerebras.modelzoo.models.gnn.data_processing.GNNDataProcessor
+
 - name: graphsage
   path: cerebras.modelzoo.models.gnn.model.GraphSAGEModel
   data_processor_paths:

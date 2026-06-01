@@ -85,6 +85,8 @@ class FullGraphDataProcessor(BaseGraphDataSource):
         label_dtype: torch.dtype,
         adj_normalization_fn,
         *,
+        adjacency_format: str = "auto",
+        sparse_matmul_max_degree: Optional[int] = None,
         drop_last: bool,
         num_workers: int,
     ):
@@ -95,6 +97,8 @@ class FullGraphDataProcessor(BaseGraphDataSource):
             float_dtype=float_dtype,
             label_dtype=label_dtype,
             adj_normalization_fn=adj_normalization_fn,
+            adjacency_format=adjacency_format,
+            sparse_matmul_max_degree=sparse_matmul_max_degree,
         )
         self.drop_last = drop_last
         self.num_workers = validate_num_workers(
@@ -159,18 +163,38 @@ class FullGraphDataProcessor(BaseGraphDataSource):
             n_feat,
             n_class,
         )
-        if cstorch.use_cs():
+        adjacency_format = self.adjacency_format
+        if adjacency_format == "auto":
+            adjacency_format = "dense" if cstorch.use_cs() else "edge_index"
+
+        if adjacency_format == "dense":
             fake_adj = to_dense_adjacency(
                 fake_edge_index,
                 fake_edge_weight,
                 num_nodes=num_nodes,
                 dtype=self.float_dtype,
             )
+        elif adjacency_format == "edge_index":
+            fake_adj = to_edge_adjacency(fake_edge_index, fake_edge_weight)
+        elif adjacency_format == "sparse_matmul":
+            from ..sources.base import sparse_scipy_to_sparse_matmul_tensors
+
+            fake_adj = sparse_scipy_to_sparse_matmul_tensors(
+                adj_sp,
+                dtype=self.float_dtype,
+                max_degree=self.sparse_matmul_max_degree,
+            )
+        else:
+            raise ValueError(f"Unsupported adjacency_format '{self.adjacency_format}'.")
+
+        if cstorch.use_cs():
             fake_features = fake_features.unsqueeze(0)
             fake_labels = fake_labels.unsqueeze(0)
             fake_mask = fake_mask.unsqueeze(0)
-        else:
-            fake_adj = to_edge_adjacency(fake_edge_index, fake_edge_weight)
+            if isinstance(fake_adj, dict):
+                fake_adj = {
+                    key: tensor.unsqueeze(0) for key, tensor in fake_adj.items()
+                }
 
         return SampleGenerator(
             data=_full_graph_payload(

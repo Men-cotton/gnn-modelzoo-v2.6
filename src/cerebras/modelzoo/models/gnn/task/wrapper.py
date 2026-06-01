@@ -12,6 +12,7 @@ from .adapters import GNNBatch, adapt_gnn_batch
 from .config import (
     GATv2Config,
     GCNConfig,
+    GCNSparseMatMulConfig,
     GNNModelConfig,
     GraphSAGEConfig,
 )
@@ -46,7 +47,7 @@ class GNNTaskWrapper(nn.Module):
 
     def build_model(self, model_config: GNNModelConfig) -> nn.Module:
         architecture_config = model_config.architecture_config
-        if isinstance(architecture_config, GCNConfig):
+        if isinstance(architecture_config, (GCNConfig, GCNSparseMatMulConfig)):
             activation_hidden = _ACTIVATION_FN_MAP[
                 architecture_config.activation_fn_hidden
             ]()
@@ -102,7 +103,8 @@ class GNNTaskWrapper(nn.Module):
         )
         logits = self.model(*adapted.model_args)
         if (
-            self.config.core_architecture.lower() == "gcn"
+            self.config.core_architecture.lower()
+            in ("gcn", "gcnsparsematmul", "gcn_sparse_matmul")
             and logits.dtype != torch.float32
         ):
             logits = logits.to(torch.float32)

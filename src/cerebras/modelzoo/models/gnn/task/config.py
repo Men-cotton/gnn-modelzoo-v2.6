@@ -36,6 +36,20 @@ class GCNConfig:
 
 
 @dataclass(frozen=True)
+class GCNSparseMatMulConfig:
+    """Normalized GCN sparse_matmul architecture configuration."""
+
+    n_feat: int
+    n_class: int
+    n_hid: int = 16
+    dropout_rate: float = 0.5
+    activation_fn_hidden: Literal["relu", "none"] = "relu"
+    activation_fn_output: Literal["relu", "none"] = "none"
+    use_bias: bool = True
+    core_architecture: Literal["GCNSparseMatMul"] = "GCNSparseMatMul"
+
+
+@dataclass(frozen=True)
 class GATv2Config:
     """Normalized GATv2 architecture configuration."""
 
@@ -66,12 +80,12 @@ class GraphSAGEConfig:
 class GNNModelConfig(GNNArchConfig):
     """Compatibility configuration for trainer-facing GNN model aliases."""
 
-    name: Literal["gatv2", "gcn", "graphsage"] = "gcn"
+    name: Literal["gatv2", "gcn", "gcn_sparse_matmul", "graphsage"] = "gcn"
     to_float16: bool = False
     disable_log_softmax: bool = False
     compute_eval_metrics: bool = True
 
-    core_architecture: Literal["GATv2", "GCN", "GraphSAGE"] = "GCN"
+    core_architecture: Literal["GATv2", "GCN", "GCNSparseMatMul", "GraphSAGE"] = "GCN"
     gatv2_num_heads: int = 8
     graphsage_hidden_dim: int = 128
     graphsage_num_layers: int = 2
@@ -81,7 +95,7 @@ class GNNModelConfig(GNNArchConfig):
     @property
     def architecture_config(
         self,
-    ) -> Union[GATv2Config, GCNConfig, GraphSAGEConfig]:
+    ) -> Union[GATv2Config, GCNConfig, GCNSparseMatMulConfig, GraphSAGEConfig]:
         if self.core_architecture.lower() == "graphsage":
             return GraphSAGEConfig(
                 n_feat=self.n_feat,
@@ -102,6 +116,16 @@ class GNNModelConfig(GNNArchConfig):
                 activation_fn_output=self.activation_fn_output,
                 use_bias=self.use_bias,
             )
+        if self.core_architecture.lower() in ("gcnsparsematmul", "gcn_sparse_matmul"):
+            return GCNSparseMatMulConfig(
+                n_feat=self.n_feat,
+                n_class=self.n_class,
+                n_hid=self.n_hid,
+                dropout_rate=self.dropout_rate,
+                activation_fn_hidden=self.activation_fn_hidden,
+                activation_fn_output=self.activation_fn_output,
+                use_bias=self.use_bias,
+            )
         return GCNConfig(
             n_feat=self.n_feat,
             n_class=self.n_class,
@@ -117,6 +141,7 @@ class GNNModelConfig(GNNArchConfig):
         from cerebras.modelzoo.models.gnn.model import (
             GATv2Model,
             GCNModel,
+            GCNSparseMatMulModel,
             GraphSAGEModel,
         )
 
@@ -124,12 +149,15 @@ class GNNModelConfig(GNNArchConfig):
             return GraphSAGEModel
         if self.name == "gatv2":
             return GATv2Model
+        if self.name == "gcn_sparse_matmul":
+            return GCNSparseMatMulModel
         return GCNModel
 
 
 __all__ = [
     "GATv2Config",
     "GCNConfig",
+    "GCNSparseMatMulConfig",
     "GNNArchConfig",
     "GNNModelConfig",
     "GraphSAGEConfig",
