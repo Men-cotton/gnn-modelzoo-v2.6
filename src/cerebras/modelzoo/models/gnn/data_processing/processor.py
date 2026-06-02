@@ -49,6 +49,7 @@ class GNNDataProcessorConfig(DataConfig):
     prefetch_factor: Optional[int] = 10
     persistent_workers: bool = True
     pin_memory: bool = True
+    static_batch_cache_size: int = 0
 
     split: Optional[Literal["train", "val", "valid", "test"]] = None
     adj_normalization: Optional[str] = (
@@ -128,6 +129,13 @@ class GNNDataProcessorConfig(DataConfig):
             context=f"{cls.__name__}.num_workers",
         )
 
+    @field_validator("static_batch_cache_size")
+    @classmethod
+    def validate_static_batch_cache_size(cls, value):
+        if value < 0:
+            raise ValueError("static_batch_cache_size must be >= 0.")
+        return value
+
     @field_validator("split", mode="after")
     @classmethod
     def _normalize_split(cls, value):
@@ -196,6 +204,7 @@ class GNNDataProcessor:
                 num_workers=self.config.num_workers,
                 pad_id=self.config.pad_node_id,
                 caching_percent=self.config.caching_percent,
+                static_batch_cache_size=self.config.static_batch_cache_size,
             )
         else:
             self._processor = FullGraphDataProcessor(

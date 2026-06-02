@@ -307,6 +307,36 @@ class GraphSAGENeighborSamplerDataset(Dataset):
         return features
 
 
+class CachedStaticGraphSAGEDataset(Dataset):
+    """Repeats precomputed static GraphSAGE batches for input-pipeline probes."""
+
+    def __init__(
+        self,
+        source_dataset: GraphSAGENeighborSamplerDataset,
+        cache_size: int,
+    ):
+        if cache_size <= 0:
+            raise ValueError("cache_size must be > 0 for cached static batches.")
+        if len(source_dataset) == 0:
+            raise ValueError("Cannot cache static batches from an empty dataset.")
+
+        self._length = len(source_dataset)
+        self._batches = [
+            source_dataset[index % self._length]
+            for index in range(min(cache_size, self._length))
+        ]
+
+    def __len__(self) -> int:
+        return self._length
+
+    def __getitem__(self, index: int) -> Dict[str, List[Tensor] | Tensor]:
+        if index < 0 or index >= self._length:
+            raise IndexError(
+                f"Batch index {index} out of range for dataset length {self._length}."
+            )
+        return self._batches[index % len(self._batches)]
+
+
 class NeighborSamplingDataProcessor(BaseGraphDataSource):
     """Prepares deterministic neighbor-sampled batches for GraphSAGE."""
 
@@ -326,6 +356,7 @@ class NeighborSamplingDataProcessor(BaseGraphDataSource):
         num_workers: int,
         pad_id: int,
         caching_percent: Optional[float] = None,
+        static_batch_cache_size: int = 0,
     ):
         super().__init__(
             dataset_name=dataset_name,
@@ -345,6 +376,7 @@ class NeighborSamplingDataProcessor(BaseGraphDataSource):
         )
         self.pad_id = pad_id
         self.caching_percent = caching_percent
+        self.static_batch_cache_size = static_batch_cache_size
         self.graph_cache = None
 
     def create_dataloader(self) -> DataLoader:
@@ -398,9 +430,16 @@ class NeighborSamplingDataProcessor(BaseGraphDataSource):
             self._graph_data_cache.edge_index = None
         del edge_index
 
+        dataloader_dataset: Dataset = dataset
+        if self.static_batch_cache_size > 0:
+            dataloader_dataset = CachedStaticGraphSAGEDataset(
+                dataset,
+                self.static_batch_cache_size,
+            )
+
         def _build_torch_dataloader() -> DataLoader:
             return DataLoader(
-                dataset,
+                dataloader_dataset,
                 batch_size=1,
                 shuffle=False,
                 drop_last=False,
@@ -412,4 +451,8 @@ class NeighborSamplingDataProcessor(BaseGraphDataSource):
         return cstorch.utils.data.DataLoader(_build_torch_dataloader)
 
 
-__all__ = ["GraphSAGENeighborSamplerDataset", "NeighborSamplingDataProcessor"]
+__all__ = [
+    "CachedStaticGraphSAGEDataset",
+    "GraphSAGENeighborSamplerDataset",
+    "NeighborSamplingDataProcessor",
+]
