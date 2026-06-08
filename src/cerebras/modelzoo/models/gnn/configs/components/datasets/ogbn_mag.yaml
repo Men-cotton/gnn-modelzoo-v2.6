@@ -1,0 +1,26 @@
+trainer:
+  init:
+    model:
+      architecture:
+        n_feat: 128
+        n_class: 349
+
+  fit:
+    train_dataloader:
+      dataset_profiles: &ogbn_mag_dataset
+        ogbn_mag:
+          dataset_name: ogbn-mag
+          data_dir: "$MODELZOO_ROOT/models/gnn/data/datasets"
+          pad_node_id: 0
+      dataset: ogbn_mag
+
+    val_dataloader: &ogbn_mag_eval_loader
+      dataset_profiles: *ogbn_mag_dataset
+      dataset: ogbn_mag
+
+  validate:
+    val_dataloader: *ogbn_mag_eval_loader
+
+  validate_all:
+    val_dataloaders:
+      - *ogbn_mag_eval_loader

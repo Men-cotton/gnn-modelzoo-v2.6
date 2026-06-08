@@ -1,0 +1,26 @@
+trainer:
+  init:
+    model:
+      architecture:
+        n_feat: 128
+        n_class: 172
+
+  fit:
+    train_dataloader:
+      dataset_profiles: &ogbn_papers100m_dataset
+        ogbn_papers100m:
+          dataset_name: ogbn-papers100M
+          data_dir: "$MODELZOO_ROOT/models/gnn/data/datasets"
+          pad_node_id: 0
+      dataset: ogbn_papers100m
+
+    val_dataloader: &ogbn_papers100m_eval_loader
+      dataset_profiles: *ogbn_papers100m_dataset
+      dataset: ogbn_papers100m
+
+  validate:
+    val_dataloader: *ogbn_papers100m_eval_loader
+
+  validate_all:
+    val_dataloaders:
+      - *ogbn_papers100m_eval_loader

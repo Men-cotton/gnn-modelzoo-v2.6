@@ -1,0 +1,12 @@
+extends: input_pipelines/full_graph.yaml
+
+trainer:
+  init:
+    model:
+      architecture:
+        type: gcn
+        n_hid: 64
+        dropout_rate: 0.5
+        activation_fn_hidden: relu
+        activation_fn_output: none
+        use_bias: True

@@ -1,0 +1,23 @@
+trainer:
+  fit:
+    train_dataloader:
+      <<: &full_graph_loader
+        data_processor: GNNDataProcessor
+        sampling_mode: full_graph
+        batch_size: 1
+        drop_last_batch: True
+        shuffle: False
+        num_workers: 8
+        adj_normalization: "gcn"
+      split: train
+
+    val_dataloader: &full_graph_eval_loader
+      <<: *full_graph_loader
+      split: val
+
+  validate:
+    val_dataloader: *full_graph_eval_loader
+
+  validate_all:
+    val_dataloaders:
+      - *full_graph_eval_loader

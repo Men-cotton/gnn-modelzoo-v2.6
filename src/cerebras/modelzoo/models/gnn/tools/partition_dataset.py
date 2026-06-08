@@ -19,6 +19,7 @@ from torch_geometric.distributed import Partitioner
 from torch_geometric.utils import mask_to_index
 from ogb.nodeproppred import PygNodePropPredDataset
 
+from cerebras.modelzoo.config.types import resolve_path
 from cerebras.modelzoo.models.gnn.reference.pyg.utils import (
     _canonicalize_ogb_name,
     _resolve_ogb_dir,
@@ -413,6 +414,7 @@ def _resolve_config_dataset(config_path: str, dataset_override: Optional[str]):
             file=sys.stderr,
         )
         raise SystemExit(1)
+    data_dir = resolve_path(data_dir)
     if not osp.isabs(data_dir):
         data_dir = str((GNN_ROOT / data_dir).resolve())
     return dataset_name, data_dir

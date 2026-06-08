@@ -1,0 +1,13 @@
+extends: input_pipelines/full_graph_raw.yaml
+
+trainer:
+  init:
+    model:
+      architecture:
+        type: gatv2
+        n_hid: 64
+        num_heads: 8
+        dropout_rate: 0.5
+        activation_fn_hidden: relu
+        activation_fn_output: none
+        use_bias: True

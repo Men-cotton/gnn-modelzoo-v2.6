@@ -9,6 +9,10 @@ from cerebras.pytorch.utils.tracker import RateTracker
 from cerebras.modelzoo.models.gnn.reference.pyg.eval import evaluate
 
 
+def _get_task_cfg(model_cfg: Dict[str, Any]) -> Dict[str, Any]:
+    return model_cfg.get("task", model_cfg)
+
+
 def train_model(
     cfg: Dict[str, Any],
     model: torch.nn.Module,
@@ -51,10 +55,11 @@ def train_model(
         weight_decay=opt_conf["weight_decay"],
     )
 
-    use_amp = bool(model_cfg.get("to_float16", False))
+    task_cfg = _get_task_cfg(model_cfg)
+    use_amp = bool(task_cfg.get("to_float16", False))
     scaler = torch.amp.GradScaler("cuda", enabled=use_amp)
-    disable_log_softmax = model_cfg.get("disable_log_softmax", False)
-    compute_eval_metrics = bool(model_cfg.get("compute_eval_metrics", True))
+    disable_log_softmax = task_cfg.get("disable_log_softmax", False)
+    compute_eval_metrics = bool(task_cfg.get("compute_eval_metrics", True))
 
     # --- Profiling Setup ---
     # Pre-allocate CUDA events to avoid allocation overhead during the loop

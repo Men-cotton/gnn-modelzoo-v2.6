@@ -1,0 +1,28 @@
+trainer:
+  init:
+    model:
+      architecture:
+        n_feat: 500
+        n_class: 3
+
+  fit:
+    train_dataloader:
+      dataset_name: PubMed
+      data_dir: "$MODELZOO_ROOT/models/gnn/data/datasets"
+
+    val_dataloader:
+      dataset_name: PubMed
+      data_dir: "$MODELZOO_ROOT/models/gnn/data/datasets"
+      split: val
+
+  validate:
+    val_dataloader:
+      dataset_name: PubMed
+      data_dir: "$MODELZOO_ROOT/models/gnn/data/datasets"
+      split: val
+
+  validate_all:
+    val_dataloaders:
+      - dataset_name: PubMed
+        data_dir: "$MODELZOO_ROOT/models/gnn/data/datasets"
+        split: val

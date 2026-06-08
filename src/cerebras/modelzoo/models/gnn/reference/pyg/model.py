@@ -29,7 +29,8 @@ class GraphSAGEWrapper(torch.nn.Module):
 
 
 def get_model(config, args=None, num_nodes=None):
-    m = config["trainer"]["init"]["model"]
+    model_config = config["trainer"]["init"]["model"]
+    architecture = model_config["architecture"]
 
     # Defaults (1x1 CAGNET)
     cagnet_rows = 1
@@ -53,25 +54,25 @@ def get_model(config, args=None, num_nodes=None):
     if use_cgnet:
         # Always use CagnetSAGE (OFFSET-GNN baseline) if distributed or forced
         model = CagnetSAGE(
-            in_channels=m["n_feat"],
-            hidden_channels=m["graphsage_hidden_dim"],
-            out_channels=m["n_class"],
+            in_channels=architecture["n_feat"],
+            hidden_channels=architecture["hidden_dim"],
+            out_channels=architecture["n_class"],
             num_nodes=num_nodes,
             rows=cagnet_rows,
             cols=cagnet_cols,
             rep=cagnet_rep,
-            dropout=m["graphsage_dropout"],
+            dropout=architecture["dropout"],
             force_cagnet=force_cagnet_flag,
         )
     else:
         # Use native PyG GraphSAGE for efficiency in single-process / standard DDP
         # We use a wrapper to ensure a separate classifier head, matching CSZoo reference architecture
         model = GraphSAGEWrapper(
-            in_channels=m["n_feat"],
-            hidden_channels=m["graphsage_hidden_dim"],
-            out_channels=m["n_class"],
-            num_layers=m["graphsage_num_layers"],
-            dropout=m["graphsage_dropout"],
+            in_channels=architecture["n_feat"],
+            hidden_channels=architecture["hidden_dim"],
+            out_channels=architecture["n_class"],
+            num_layers=architecture["num_layers"],
+            dropout=architecture["dropout"],
         )
 
     return model

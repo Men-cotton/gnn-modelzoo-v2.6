@@ -9,37 +9,16 @@ from .task.wrapper import GNNTaskWrapper
 logger = logging.getLogger(__name__)
 
 
-class GATv2Model(GNNTaskWrapper):
-    """Alias model registered separately for GATv2 experiments."""
-
-    pass
-
-
-class GCNModel(GNNTaskWrapper):
-    """Alias model registered separately for GCN experiments."""
-
-    pass
-
-
-class GCNSparseMatMulModel(GNNTaskWrapper):
-    """Alias model registered separately for sparse_matmul GCN experiments."""
-
-    pass
-
-
-class GraphSAGEModel(GNNTaskWrapper):
-    """Alias model registered separately for GraphSAGE experiments."""
+class GNNModel(GNNTaskWrapper):
+    """Generic trainer-facing GNN model driven by architecture config."""
 
     pass
 
 
 __all__ = [
     "FullGraphBatch",
-    "GATv2Model",
-    "GCNModel",
-    "GCNSparseMatMulModel",
     "GNNArchConfig",
+    "GNNModel",
     "GNNModelConfig",
     "GraphSAGEBatch",
-    "GraphSAGEModel",
 ]

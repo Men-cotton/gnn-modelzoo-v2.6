@@ -1,33 +1,15 @@
+extends:
+  - components/runtime/default.yaml
+  - components/architectures/graphsage.yaml
+  - components/datasets/mag240m.yaml
+
 trainer:
   init:
     model_dir: "$MODELZOO_ROOT/models/gnn/docs/artifacts/runtime/model_dirs/mag240m_graphsage"
-    seed: 42
-    model:
-      name: graphsage
-
-      # Dataset-specific dimensions for MAG240M
-      n_feat: 1536
-      n_class: 153
-
-      to_float16: True
-      compute_eval_metrics: False
-      disable_log_softmax: False
-      core_architecture: GraphSAGE
-      graphsage_hidden_dim: 1024
-      graphsage_num_layers: 3
-      graphsage_dropout: 0.5
-      graphsage_aggregator: mean
 
     optimizer:
       AdamW:
-        params: []
         learning_rate: 0.0015
-        weight_decay: 0.0005
-
-    precision:
-      enabled: True
-      fp16_type: "float16"
-      loss_scaling_factor: "dynamic"
 
     loop:
       max_steps: 3000
@@ -36,50 +18,3 @@ trainer:
 
     logging:
       log_steps: 120
-
-  fit:
-    train_dataloader:
-      data_processor: GNNDataProcessor
-      dataset_profiles: &mag240m_dataset
-        mag240m:
-          dataset_name: MAG240M
-          data_dir: "$MODELZOO_ROOT/models/gnn/data/datasets"
-          sampling_mode: neighbor
-          fanouts: [15, 10, 5]
-          pad_node_id: 0
-      dataset: mag240m
-      batch_size: 4096
-      drop_last_batch: False
-      shuffle: True
-      num_workers: 8
-      prefetch_factor: 2
-      persistent_workers: True
-      pin_memory: True
-      sampler_seed: 42
-      caching_percent: null # Auto-detect based on memory
-      split: train
-
-    val_dataloader: &mag240m_eval_loader
-      data_processor: GNNDataProcessor
-      dataset_profiles: *mag240m_dataset
-      dataset: mag240m
-      batch_size: 4096
-      drop_last_batch: False
-      shuffle: False
-      num_workers: 8
-      prefetch_factor: 2
-      persistent_workers: True
-      pin_memory: True
-      sampler_seed: 42
-      split: valid
-
-  validate:
-    val_dataloader: *mag240m_eval_loader
-
-  validate_all:
-    val_dataloaders:
-      - *mag240m_eval_loader
-
-runconfig:
-  python_paths:
-    - "$MODELZOO_ROOT/../.."

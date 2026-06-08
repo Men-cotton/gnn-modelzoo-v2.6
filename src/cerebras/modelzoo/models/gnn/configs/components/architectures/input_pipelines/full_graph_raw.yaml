@@ -1,0 +1,17 @@
+extends: full_graph.yaml
+
+trainer:
+  fit:
+    train_dataloader:
+      adj_normalization: none
+
+    val_dataloader:
+      adj_normalization: none
+
+  validate:
+    val_dataloader:
+      adj_normalization: none
+
+  validate_all:
+    val_dataloaders:
+      - adj_normalization: none

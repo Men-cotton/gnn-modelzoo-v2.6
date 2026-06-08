@@ -1,0 +1,29 @@
+trainer:
+  fit:
+    train_dataloader:
+      <<: &neighbor_loader
+        data_processor: GNNDataProcessor
+        sampling_mode: neighbor
+        fanouts: [15, 10, 5]
+        batch_size: 4096
+        drop_last_batch: False
+        num_workers: 8
+        prefetch_factor: 2
+        persistent_workers: True
+        pin_memory: True
+        sampler_seed: 42
+      shuffle: True
+      caching_percent: null
+      split: train
+
+    val_dataloader: &neighbor_eval_loader
+      <<: *neighbor_loader
+      shuffle: False
+      split: valid
+
+  validate:
+    val_dataloader: *neighbor_eval_loader
+
+  validate_all:
+    val_dataloaders:
+      - *neighbor_eval_loader

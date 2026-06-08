@@ -1,0 +1,26 @@
+trainer:
+  init:
+    model:
+      architecture:
+        n_feat: 100
+        n_class: 47
+
+  fit:
+    train_dataloader:
+      dataset_profiles: &ogbn_products_dataset
+        ogbn_products:
+          dataset_name: ogbn-products
+          data_dir: "$MODELZOO_ROOT/models/gnn/data/datasets"
+          pad_node_id: 0
+      dataset: ogbn_products
+
+    val_dataloader: &ogbn_products_eval_loader
+      dataset_profiles: *ogbn_products_dataset
+      dataset: ogbn_products
+
+  validate:
+    val_dataloader: *ogbn_products_eval_loader
+
+  validate_all:
+    val_dataloaders:
+      - *ogbn_products_eval_loader

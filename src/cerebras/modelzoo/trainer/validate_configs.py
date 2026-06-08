@@ -27,8 +27,9 @@ def validate_config(params_file: str):
     import logging
     import os
 
-    import yaml
-
+    from cerebras.modelzoo.common.utils.run.config_loader import (
+        load_params_file,
+    )
     from cerebras.modelzoo.trainer.utils import (
         convert_legacy_params_to_trainer_params,
         is_legacy_params,
@@ -38,8 +39,7 @@ def validate_config(params_file: str):
     if not os.path.exists(params_file):
         raise FileNotFoundError(f"File {params_file} not found")
 
-    with open(params_file, "r") as f:
-        params = yaml.safe_load(f)
+    params = load_params_file(params_file)
 
     if is_legacy_params(params):
         params = convert_legacy_params_to_trainer_params(params)

@@ -1,0 +1,26 @@
+trainer:
+  init:
+    model:
+      architecture:
+        n_feat: 1536
+        n_class: 153
+
+  fit:
+    train_dataloader:
+      dataset_profiles: &mag240m_dataset
+        mag240m:
+          dataset_name: MAG240M
+          data_dir: "$MODELZOO_ROOT/models/gnn/data/datasets"
+          pad_node_id: 0
+      dataset: mag240m
+
+    val_dataloader: &mag240m_eval_loader
+      dataset_profiles: *mag240m_dataset
+      dataset: mag240m
+
+  validate:
+    val_dataloader: *mag240m_eval_loader
+
+  validate_all:
+    val_dataloaders:
+      - *mag240m_eval_loader

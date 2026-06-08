@@ -1,34 +1,15 @@
+extends:
+  - components/runtime/default.yaml
+  - components/architectures/graphsage.yaml
+  - components/datasets/pubmed.yaml
+
 trainer:
   init:
     model_dir: "$MODELZOO_ROOT/models/gnn/docs/artifacts/runtime/model_dirs/PubMed_graphsage"
-    seed: 42
-    model:
-      name: graphsage
-
-      # Dataset-specific dimensions
-      n_feat: 500
-      n_class: 3
-
-      # Wrapper parameters
-      to_float16: True
-      compute_eval_metrics: False
-      disable_log_softmax: False
-      core_architecture: GraphSAGE
-      graphsage_hidden_dim: 1024
-      graphsage_num_layers: 3
-      graphsage_dropout: 0.5
-      graphsage_aggregator: mean
 
     optimizer:
       AdamW:
-        params: []
         learning_rate: 0.01
-        weight_decay: 0.0005
-
-    precision:
-      enabled: True
-      fp16_type: "float16"
-      loss_scaling_factor: "dynamic"
 
     loop:
       max_steps: 200
@@ -40,45 +21,15 @@ trainer:
 
   fit:
     train_dataloader:
-      data_processor: GNNDataProcessor
-      dataset_name: PubMed
-      data_dir: "$MODELZOO_ROOT/models/gnn/data/datasets"
-      sampling_mode: neighbor
-      fanouts: [15, 10, 5]
       batch_size: 8
-      drop_last_batch: False
-      shuffle: True
-      num_workers: 8
-      prefetch_factor: 2
-      persistent_workers: True
-      pin_memory: True
-      sampler_seed: 42
-      caching_percent: null
-      split: train
 
-    val_dataloader: &val_neighbor_params
-      data_processor: GNNDataProcessor
-      dataset_name: PubMed
-      data_dir: "$MODELZOO_ROOT/models/gnn/data/datasets"
-      sampling_mode: neighbor
-      fanouts: [15, 10, 5]
+    val_dataloader:
       batch_size: 64
-      drop_last_batch: False
-      shuffle: False
-      num_workers: 8
-      prefetch_factor: 2
-      persistent_workers: True
-      pin_memory: True
-      sampler_seed: 42
-      split: val
 
   validate:
-    val_dataloader: *val_neighbor_params
+    val_dataloader:
+      batch_size: 64
 
   validate_all:
     val_dataloaders:
-      - *val_neighbor_params
-
-runconfig:
-  python_paths:
-    - "$MODELZOO_ROOT/../.."
+      - batch_size: 64

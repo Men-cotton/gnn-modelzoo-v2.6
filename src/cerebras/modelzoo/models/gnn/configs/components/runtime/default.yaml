@@ -1,0 +1,22 @@
+trainer:
+  init:
+    seed: 42
+    model:
+      name: gnn
+      task:
+        compute_eval_metrics: False
+        disable_log_softmax: False
+
+    optimizer:
+      AdamW:
+        params: []
+        weight_decay: 0.0005
+
+    precision:
+      enabled: True
+      fp16_type: "float16"
+      loss_scaling_factor: "dynamic"
+
+runconfig:
+  python_paths:
+    - "$MODELZOO_ROOT/../.."

@@ -1,0 +1,27 @@
+extends: input_pipelines/full_graph.yaml
+
+trainer:
+  init:
+    model:
+      architecture:
+        type: gcn_sparse_matmul
+        n_hid: 64
+        dropout_rate: 0.5
+        activation_fn_hidden: relu
+        activation_fn_output: none
+        use_bias: True
+
+  fit:
+    train_dataloader:
+      adjacency_format: sparse_matmul
+
+    val_dataloader:
+      adjacency_format: sparse_matmul
+
+  validate:
+    val_dataloader:
+      adjacency_format: sparse_matmul
+
+  validate_all:
+    val_dataloaders:
+      - adjacency_format: sparse_matmul

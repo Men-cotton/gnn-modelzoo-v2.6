@@ -2,23 +2,8 @@ version: 0.1
 
 models:
 
-- name: gatv2
-  path: cerebras.modelzoo.models.gnn.model.GATv2Model
-  data_processor_paths:
-  - cerebras.modelzoo.models.gnn.data_processing.GNNDataProcessor
-
-- name: gcn
-  path: cerebras.modelzoo.models.gnn.model.GCNModel
-  data_processor_paths:
-  - cerebras.modelzoo.models.gnn.data_processing.GNNDataProcessor
-
-- name: gcn_sparse_matmul
-  path: cerebras.modelzoo.models.gnn.model.GCNSparseMatMulModel
-  data_processor_paths:
-  - cerebras.modelzoo.models.gnn.data_processing.GNNDataProcessor
-
-- name: graphsage
-  path: cerebras.modelzoo.models.gnn.model.GraphSAGEModel
+- name: gnn
+  path: cerebras.modelzoo.models.gnn.model.GNNModel
   data_processor_paths:
   - cerebras.modelzoo.models.gnn.data_processing.GNNDataProcessor
 

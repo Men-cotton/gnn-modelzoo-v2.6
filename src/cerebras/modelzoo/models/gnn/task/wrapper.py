@@ -1,26 +1,14 @@
 from __future__ import annotations
 
-from typing import Dict, Type
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from cerebras.pytorch.metrics import AccuracyMetric
 
-from ..architectures.registry import get_architecture_class
-from .adapters import GNNBatch, adapt_gnn_batch
-from .config import (
-    GATv2Config,
-    GCNConfig,
-    GCNSparseMatMulConfig,
-    GNNModelConfig,
-    GraphSAGEConfig,
-)
-
-_ACTIVATION_FN_MAP: Dict[str, Type[nn.Module]] = {
-    "relu": nn.ReLU,
-    "none": nn.Identity,
-}
+from ..architectures.registry import get_architecture_spec_for_config
+from ..architectures.spec import ArchitectureSpec
+from .adapters import GNNBatch
+from .config import GNNModelConfig
 
 
 class GNNTaskWrapper(nn.Module):
@@ -36,7 +24,11 @@ class GNNTaskWrapper(nn.Module):
         else:
             self.config = config
 
-        self.model = self.build_model(self.config)
+        self.architecture_config = self.config.architecture_config
+        self.architecture_spec = get_architecture_spec_for_config(
+            self.architecture_config
+        )
+        self.model = self.build_model(self.architecture_spec, self.architecture_config)
         self.nll_loss_fn = nn.NLLLoss(ignore_index=-100)
         self.ce_loss_fn = nn.CrossEntropyLoss(ignore_index=-100)
         self.accuracy_metric = (
@@ -45,76 +37,23 @@ class GNNTaskWrapper(nn.Module):
             else None
         )
 
-    def build_model(self, model_config: GNNModelConfig) -> nn.Module:
-        architecture_config = model_config.architecture_config
-        if isinstance(architecture_config, GCNSparseMatMulConfig):
-            raise NotImplementedError(
-                "gcn_sparse_matmul is unsupported: the PubMed full-graph GCN "
-                "mapping emits cirh.SparseMatMul with graph nodes as the sparse "
-                "dimension, which does not lower to WAF on CSX and is "
-                "impractical on CPU."
-            )
-        if isinstance(architecture_config, GCNConfig):
-            activation_hidden = _ACTIVATION_FN_MAP[
-                architecture_config.activation_fn_hidden
-            ]()
-            activation_output = _ACTIVATION_FN_MAP[
-                architecture_config.activation_fn_output
-            ]()
-            return get_architecture_class(architecture_config.core_architecture)(
-                in_dim=architecture_config.n_feat,
-                hidden_dim=architecture_config.n_hid,
-                num_classes=architecture_config.n_class,
-                dropout_rate=architecture_config.dropout_rate,
-                activation_hidden=activation_hidden,
-                activation_output=activation_output,
-                use_bias=architecture_config.use_bias,
-            )
-        if isinstance(architecture_config, GATv2Config):
-            activation_hidden = _ACTIVATION_FN_MAP[
-                architecture_config.activation_fn_hidden
-            ]()
-            activation_output = _ACTIVATION_FN_MAP[
-                architecture_config.activation_fn_output
-            ]()
-            return get_architecture_class(architecture_config.core_architecture)(
-                in_dim=architecture_config.n_feat,
-                hidden_dim=architecture_config.n_hid,
-                num_classes=architecture_config.n_class,
-                num_heads=architecture_config.num_heads,
-                dropout_rate=architecture_config.dropout_rate,
-                activation_hidden=activation_hidden,
-                activation_output=activation_output,
-                use_bias=architecture_config.use_bias,
-            )
-        if isinstance(architecture_config, GraphSAGEConfig):
-            return get_architecture_class(architecture_config.core_architecture)(
-                input_dim=architecture_config.n_feat,
-                hidden_dim=architecture_config.hidden_dim,
-                num_layers=architecture_config.num_layers,
-                dropout=architecture_config.dropout,
-                aggregator=architecture_config.aggregator,
-                num_classes=architecture_config.n_class,
-            )
-        raise ValueError(
-            f"Unsupported core architecture '{model_config.core_architecture}'."
-        )
+    def build_model(
+        self,
+        architecture_spec: ArchitectureSpec,
+        architecture_config,
+    ) -> nn.Module:
+        return architecture_spec.build_model(architecture_config)
 
     def forward(self, batch: GNNBatch) -> torch.Tensor:
         param = next(self.parameters())
-        adapted = adapt_gnn_batch(
+        adapted = self.architecture_spec.adapt_batch(
             batch,
-            architecture=self.config.core_architecture,
-            device=param.device,
-            model_dtype=param.dtype,
+            param.device,
+            param.dtype,
+            self.architecture_spec.name,
         )
         logits = self.model(*adapted.model_args)
-        if (
-            self.config.core_architecture.lower()
-            in ("gcn", "gcnsparsematmul", "gcn_sparse_matmul")
-            and logits.dtype != torch.float32
-        ):
-            logits = logits.to(torch.float32)
+        logits = self.architecture_spec.postprocess_logits(logits)
 
         labels_long = adapted.labels.to(torch.long)
         mask = adapted.target_mask.to(torch.bool)

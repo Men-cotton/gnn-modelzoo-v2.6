@@ -21,17 +21,13 @@ import os
 import sys
 from typing import Callable, List, Optional, Set, Union
 
-import yaml
-
+from cerebras.modelzoo.common.utils.run.config_loader import load_params_file
 from cerebras.modelzoo.common.utils.run.utils import DeviceType
-from cerebras.modelzoo.common.utils.utils import UniqueKeyLoader
 
 
 def read_params_file(params_file: str) -> dict:
     """Helper for loading params file."""
-    with open(params_file, 'r') as stream:
-        params = yaml.load(stream, Loader=UniqueKeyLoader)
-    return params
+    return load_params_file(params_file)
 
 
 def get_params(

@@ -1,19 +1,27 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from typing import Literal, Union
 
 from annotated_types import Ge, Le
 from cerebras.modelzoo.config import ModelConfig
+from pydantic import BaseModel, ConfigDict, Field
 from typing_extensions import Annotated
 
 
-class GNNArchConfig(ModelConfig):
-    """Base configuration for GNN architecture parameters."""
+class _GNNNestedConfig(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        frozen=True,
+        validate_default=True,
+    )
 
+
+class GCNConfig(_GNNNestedConfig):
+    """GCN architecture configuration."""
+
+    type: Literal["gcn", "GCN"] = "gcn"
     n_feat: int
     n_class: int
-
     n_hid: int = 16
     dropout_rate: Annotated[float, Ge(0), Le(1)] = 0.5
     activation_fn_hidden: Literal["relu", "none"] = "relu"
@@ -21,144 +29,108 @@ class GNNArchConfig(ModelConfig):
     use_bias: bool = True
 
 
-@dataclass(frozen=True)
-class GCNConfig:
-    """Normalized GCN architecture configuration."""
+class GCNSparseMatMulConfig(_GNNNestedConfig):
+    """GCN sparse_matmul architecture configuration."""
 
+    type: Literal[
+        "gcn_sparse_matmul",
+        "gcnsparsematmul",
+        "GCNSparseMatMul",
+    ] = "gcn_sparse_matmul"
     n_feat: int
     n_class: int
     n_hid: int = 16
-    dropout_rate: float = 0.5
+    dropout_rate: Annotated[float, Ge(0), Le(1)] = 0.5
     activation_fn_hidden: Literal["relu", "none"] = "relu"
     activation_fn_output: Literal["relu", "none"] = "none"
     use_bias: bool = True
-    core_architecture: Literal["GCN"] = "GCN"
 
 
-@dataclass(frozen=True)
-class GCNSparseMatMulConfig:
-    """Normalized GCN sparse_matmul architecture configuration."""
+class GATv2Config(_GNNNestedConfig):
+    """GATv2 architecture configuration."""
 
-    n_feat: int
-    n_class: int
-    n_hid: int = 16
-    dropout_rate: float = 0.5
-    activation_fn_hidden: Literal["relu", "none"] = "relu"
-    activation_fn_output: Literal["relu", "none"] = "none"
-    use_bias: bool = True
-    core_architecture: Literal["GCNSparseMatMul"] = "GCNSparseMatMul"
-
-
-@dataclass(frozen=True)
-class GATv2Config:
-    """Normalized GATv2 architecture configuration."""
-
+    type: Literal["gatv2", "GATv2"] = "gatv2"
     n_feat: int
     n_class: int
     n_hid: int = 16
     num_heads: int = 8
-    dropout_rate: float = 0.5
+    dropout_rate: Annotated[float, Ge(0), Le(1)] = 0.5
     activation_fn_hidden: Literal["relu", "none"] = "relu"
     activation_fn_output: Literal["relu", "none"] = "none"
     use_bias: bool = True
-    core_architecture: Literal["GATv2"] = "GATv2"
 
 
-@dataclass(frozen=True)
-class GraphSAGEConfig:
-    """Normalized GraphSAGE architecture configuration."""
+class GraphSAGEConfig(_GNNNestedConfig):
+    """GraphSAGE architecture configuration."""
 
+    type: Literal["graphsage", "GraphSAGE"] = "graphsage"
     n_feat: int
     n_class: int
     hidden_dim: int = 128
     num_layers: int = 2
-    dropout: float = 0.5
+    dropout: Annotated[float, Ge(0), Le(1)] = 0.5
     aggregator: Literal["mean", "sum", "max"] = "mean"
-    core_architecture: Literal["GraphSAGE"] = "GraphSAGE"
 
 
-class GNNModelConfig(GNNArchConfig):
-    """Compatibility configuration for trainer-facing GNN model aliases."""
+ArchitectureConfig = Union[
+    GATv2Config,
+    GraphSAGEConfig,
+    GCNSparseMatMulConfig,
+    GCNConfig,
+]
 
-    name: Literal["gatv2", "gcn", "gcn_sparse_matmul", "graphsage"] = "gcn"
+
+class GNNTaskConfig(_GNNNestedConfig):
+    """Trainer-facing GNN task policy."""
+
     to_float16: bool = False
     disable_log_softmax: bool = False
     compute_eval_metrics: bool = True
 
-    core_architecture: Literal["GATv2", "GCN", "GCNSparseMatMul", "GraphSAGE"] = "GCN"
-    gatv2_num_heads: int = 8
-    graphsage_hidden_dim: int = 128
-    graphsage_num_layers: int = 2
-    graphsage_dropout: Annotated[float, Ge(0), Le(1)] = 0.5
-    graphsage_aggregator: Literal["mean", "sum", "max"] = "mean"
+
+class GNNArchConfig(ModelConfig):
+    """Base trainer-facing GNN configuration."""
+
+    name: Literal["gnn"] = "gnn"
+    architecture: ArchitectureConfig
+    task: GNNTaskConfig = Field(default_factory=GNNTaskConfig)
+
+
+class GNNModelConfig(GNNArchConfig):
+    """Trainer-facing GNN model config."""
 
     @property
     def architecture_config(
         self,
     ) -> Union[GATv2Config, GCNConfig, GCNSparseMatMulConfig, GraphSAGEConfig]:
-        if self.core_architecture.lower() == "graphsage":
-            return GraphSAGEConfig(
-                n_feat=self.n_feat,
-                n_class=self.n_class,
-                hidden_dim=self.graphsage_hidden_dim,
-                num_layers=self.graphsage_num_layers,
-                dropout=self.graphsage_dropout,
-                aggregator=self.graphsage_aggregator,
-            )
-        if self.core_architecture.lower() == "gatv2":
-            return GATv2Config(
-                n_feat=self.n_feat,
-                n_class=self.n_class,
-                n_hid=self.n_hid,
-                num_heads=self.gatv2_num_heads,
-                dropout_rate=self.dropout_rate,
-                activation_fn_hidden=self.activation_fn_hidden,
-                activation_fn_output=self.activation_fn_output,
-                use_bias=self.use_bias,
-            )
-        if self.core_architecture.lower() in ("gcnsparsematmul", "gcn_sparse_matmul"):
-            return GCNSparseMatMulConfig(
-                n_feat=self.n_feat,
-                n_class=self.n_class,
-                n_hid=self.n_hid,
-                dropout_rate=self.dropout_rate,
-                activation_fn_hidden=self.activation_fn_hidden,
-                activation_fn_output=self.activation_fn_output,
-                use_bias=self.use_bias,
-            )
-        return GCNConfig(
-            n_feat=self.n_feat,
-            n_class=self.n_class,
-            n_hid=self.n_hid,
-            dropout_rate=self.dropout_rate,
-            activation_fn_hidden=self.activation_fn_hidden,
-            activation_fn_output=self.activation_fn_output,
-            use_bias=self.use_bias,
-        )
+        return self.architecture
+
+    @property
+    def to_float16(self) -> bool:
+        return self.task.to_float16
+
+    @property
+    def disable_log_softmax(self) -> bool:
+        return self.task.disable_log_softmax
+
+    @property
+    def compute_eval_metrics(self) -> bool:
+        return self.task.compute_eval_metrics
 
     @property
     def __model_cls__(self):
-        from cerebras.modelzoo.models.gnn.model import (
-            GATv2Model,
-            GCNModel,
-            GCNSparseMatMulModel,
-            GraphSAGEModel,
-        )
+        from cerebras.modelzoo.models.gnn.model import GNNModel
 
-        if self.name == "graphsage":
-            return GraphSAGEModel
-        if self.name == "gatv2":
-            return GATv2Model
-        if self.name == "gcn_sparse_matmul":
-            return GCNSparseMatMulModel
-        return GCNModel
+        return GNNModel
 
 
 __all__ = [
     "GATv2Config",
+    "ArchitectureConfig",
     "GCNConfig",
     "GCNSparseMatMulConfig",
     "GNNArchConfig",
     "GNNModelConfig",
+    "GNNTaskConfig",
     "GraphSAGEConfig",
 ]

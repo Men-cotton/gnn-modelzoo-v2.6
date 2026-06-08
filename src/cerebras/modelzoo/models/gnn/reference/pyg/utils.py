@@ -7,7 +7,8 @@ import sys
 from importlib import import_module
 from pathlib import Path
 from typing import Iterable
-import yaml
+
+from cerebras.modelzoo.common.utils.run.config_loader import load_params_file
 
 
 class OfflineDatasetNotFound(FileNotFoundError):
@@ -51,8 +52,7 @@ def ensure_pickle_friendly_load():
 
 
 def load_cfg(path: str):
-    with open(path, "r") as f:
-        return yaml.safe_load(f)
+    return load_params_file(path)
 
 
 def setup_ddp():
