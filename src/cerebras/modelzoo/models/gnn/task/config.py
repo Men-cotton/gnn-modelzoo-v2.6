@@ -60,6 +60,26 @@ class GATv2Config(_GNNNestedConfig):
     use_bias: bool = True
 
 
+class GraphTransformerConfig(_GNNNestedConfig):
+    """Graph Transformer architecture configuration."""
+
+    type: Literal[
+        "graph_transformer",
+        "graphtransformer",
+        "GraphTransformer",
+    ] = "graph_transformer"
+    n_feat: int
+    n_class: int
+    n_hid: int = 64
+    num_heads: int = 8
+    dropout_rate: Annotated[float, Ge(0), Le(1)] = 0.5
+    activation_fn_hidden: Literal["relu", "none"] = "relu"
+    activation_fn_output: Literal["relu", "none"] = "none"
+    use_bias: bool = True
+    beta: bool = True
+    root_weight: bool = True
+
+
 class GraphSAGEConfig(_GNNNestedConfig):
     """GraphSAGE architecture configuration."""
 
@@ -73,6 +93,7 @@ class GraphSAGEConfig(_GNNNestedConfig):
 
 
 ArchitectureConfig = Union[
+    GraphTransformerConfig,
     GATv2Config,
     GraphSAGEConfig,
     GCNSparseMatMulConfig,
@@ -102,7 +123,13 @@ class GNNModelConfig(GNNArchConfig):
     @property
     def architecture_config(
         self,
-    ) -> Union[GATv2Config, GCNConfig, GCNSparseMatMulConfig, GraphSAGEConfig]:
+    ) -> Union[
+        GraphTransformerConfig,
+        GATv2Config,
+        GCNConfig,
+        GCNSparseMatMulConfig,
+        GraphSAGEConfig,
+    ]:
         return self.architecture
 
     @property
@@ -132,5 +159,6 @@ __all__ = [
     "GNNArchConfig",
     "GNNModelConfig",
     "GNNTaskConfig",
+    "GraphTransformerConfig",
     "GraphSAGEConfig",
 ]

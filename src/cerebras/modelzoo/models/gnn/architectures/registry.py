@@ -7,14 +7,27 @@ import torch.nn as nn
 from ..data_processing.batches import FullGraphBatch, GraphSAGEBatch
 from ..task.adapters import adapt_full_graph_batch, adapt_graphsage_batch
 from ..task.adapters import coerce_gnn_batch
-from ..task.config import GATv2Config, GCNConfig, GCNSparseMatMulConfig, GraphSAGEConfig
+from ..task.config import (
+    GATv2Config,
+    GCNConfig,
+    GCNSparseMatMulConfig,
+    GraphTransformerConfig,
+    GraphSAGEConfig,
+)
 from .gatv2 import GATv2
 from .gcn import GCN
 from .gcn_sparse_matmul import GCNSparseMatMul
+from .graph_transformer import GraphTransformer
 from .graphsage import GraphSAGE
 from .spec import ArchitectureSpec, float32_logits, identity_logits
 
-ArchitectureName = Literal["GATv2", "GCN", "GCNSparseMatMul", "GraphSAGE"]
+ArchitectureName = Literal[
+    "GATv2",
+    "GCN",
+    "GCNSparseMatMul",
+    "GraphSAGE",
+    "GraphTransformer",
+]
 
 _ACTIVATION_FN_MAP: Dict[str, Type[nn.Module]] = {
     "relu": nn.ReLU,
@@ -27,6 +40,8 @@ _ARCHITECTURE_REGISTRY: Dict[str, Type[nn.Module]] = {
     "gcn": GCN,
     "gcnsparsematmul": GCNSparseMatMul,
     "gcn_sparse_matmul": GCNSparseMatMul,
+    "graphtransformer": GraphTransformer,
+    "graph_transformer": GraphTransformer,
     "graphsage": GraphSAGE,
 }
 
@@ -57,6 +72,23 @@ def _build_gatv2(config: GATv2Config) -> nn.Module:
         activation_hidden=activation_hidden,
         activation_output=activation_output,
         use_bias=config.use_bias,
+    )
+
+
+def _build_graph_transformer(config: GraphTransformerConfig) -> nn.Module:
+    activation_hidden = _ACTIVATION_FN_MAP[config.activation_fn_hidden]()
+    activation_output = _ACTIVATION_FN_MAP[config.activation_fn_output]()
+    return GraphTransformer(
+        in_dim=config.n_feat,
+        hidden_dim=config.n_hid,
+        num_classes=config.n_class,
+        num_heads=config.num_heads,
+        dropout_rate=config.dropout_rate,
+        activation_hidden=activation_hidden,
+        activation_output=activation_output,
+        use_bias=config.use_bias,
+        beta=config.beta,
+        root_weight=config.root_weight,
     )
 
 
@@ -124,6 +156,15 @@ _ARCHITECTURE_SPECS: Dict[str, ArchitectureSpec] = {
         config_types=(GATv2Config,),
         model_cls=GATv2,
         build_model=_build_gatv2,
+        adapt_batch=_adapt_full_graph,
+        postprocess_logits=identity_logits,
+    ),
+    "graphtransformer": ArchitectureSpec(
+        name="GraphTransformer",
+        aliases=("graphtransformer", "graph_transformer"),
+        config_types=(GraphTransformerConfig,),
+        model_cls=GraphTransformer,
+        build_model=_build_graph_transformer,
         adapt_batch=_adapt_full_graph,
         postprocess_logits=identity_logits,
     ),
