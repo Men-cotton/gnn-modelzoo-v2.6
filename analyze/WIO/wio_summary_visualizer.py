@@ -72,6 +72,52 @@ def _parse_int(value: str) -> int | None:
     return int(value) if value.isdigit() else None
 
 
+def _parse_compute_core_block(
+    lines: List[str], start_idx: int
+) -> Tuple[
+    Tuple[int, int] | None,
+    Tuple[int, int] | None,
+    int | None,
+    int | None,
+    int,
+]:
+    compute_core_origin: Tuple[int, int] | None = None
+    compute_core_size: Tuple[int, int] | None = None
+    lanes: int | None = None
+    lane_width: int | None = None
+
+    idx = start_idx + 1
+    while idx < len(lines):
+        stripped = lines[idx].strip()
+        if not stripped or stripped.startswith("I/O kernels and buffers"):
+            break
+
+        origin_match = re.search(r"Origin\s*:\s*\((\d+),\s*(\d+)\)", stripped)
+        if origin_match:
+            compute_core_origin = (
+                int(origin_match.group(1)),
+                int(origin_match.group(2)),
+            )
+
+        size_match = re.search(
+            r"Size\s*:\s*(\d+)\s+columns x\s+(\d+)\s+rows", stripped
+        )
+        if size_match:
+            compute_core_size = (int(size_match.group(1)), int(size_match.group(2)))
+
+        lanes_match = re.search(r"Lanes\s*:\s*(\d+)", stripped)
+        if lanes_match:
+            lanes = int(lanes_match.group(1))
+
+        lane_width_match = re.search(r"Lane width\s*:\s*(\d+)\s+columns", stripped)
+        if lane_width_match:
+            lane_width = int(lane_width_match.group(1))
+
+        idx += 1
+
+    return compute_core_origin, compute_core_size, lanes, lane_width, idx
+
+
 def parse_wio_report(path: Path) -> WioReport:
     lines = path.read_text().splitlines()
 
@@ -98,26 +144,14 @@ def parse_wio_report(path: Path) -> WioReport:
             idx += 2
             continue
 
-        if stripped.startswith("Compute core"):
-            origin_line = lines[idx + 1]
-            size_line = lines[idx + 2]
-            lanes_line = lines[idx + 3]
-            lane_width_line = lines[idx + 4]
-
-            origin_match = re.search(r"Origin\s*:\s*\((\d+),\s*(\d+)\)", origin_line)
-            size_match = re.search(r"Size\s*:\s*(\d+)\s+columns x\s+(\d+)\s+rows", size_line)
-            lanes_match = re.search(r"Lanes\s*:\s*(\d+)", lanes_line)
-            lane_width_match = re.search(r"Lane width:\s*(\d+)\s+columns", lane_width_line)
-
-            if origin_match:
-                compute_core_origin = (int(origin_match.group(1)), int(origin_match.group(2)))
-            if size_match:
-                compute_core_size = (int(size_match.group(1)), int(size_match.group(2)))
-            if lanes_match:
-                lanes = int(lanes_match.group(1))
-            if lane_width_match:
-                lane_width = int(lane_width_match.group(1))
-            idx += 5
+        if stripped.startswith("Compute core") or re.match(r"Core:\s*\d+", stripped):
+            (
+                compute_core_origin,
+                compute_core_size,
+                lanes,
+                lane_width,
+                idx,
+            ) = _parse_compute_core_block(lines, idx)
             continue
 
         if stripped.startswith("I/O kernels and buffers"):
