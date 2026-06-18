@@ -19,13 +19,21 @@ def evaluate(model, loader, device, cache=None):
     correct = 0
     for batch in loader:
         batch = batch.to(device, non_blocking=True)
-        if cache is not None:
+        if hasattr(batch, "node_idx"):
+            out = model(batch.x, batch.edge_index)
+            node_idx = batch.node_idx
+            out = out.index_select(0, node_idx)
+            y = batch.y.index_select(0, node_idx).view(-1)
+        elif cache is not None:
             batch.x = cache.fetch(batch.n_id)
-        # GraphSAGE with NeighborLoader: pass batch_size to get only seed nodes
-        out = model(batch.x, batch.edge_index, batch_size=batch.batch_size)
-        out = out[: batch.batch_size]
+            out = model(batch.x, batch.edge_index, batch_size=batch.batch_size)
+            out = out[: batch.batch_size]
+            y = batch.y[: batch.batch_size].view(-1)
+        else:
+            out = model(batch.x, batch.edge_index, batch_size=batch.batch_size)
+            out = out[: batch.batch_size]
+            y = batch.y[: batch.batch_size].view(-1)
         pred = out.argmax(dim=-1)
-        y = batch.y[: batch.batch_size].view(-1)
         correct += (pred == y).sum().item()
         total += y.numel()
     if dist.is_available() and dist.is_initialized():

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Executes the PyG GraphSAGE training.
+# Executes a PyG GNN training run.
 
 set -euo pipefail
 
@@ -18,7 +18,7 @@ source "${PEGASUS_DIR}/gpu_env.sh"
 
 SCRIPT_NAME="$(basename "$0")"
 
-PYTHON_SCRIPT_NAME="src/cerebras/modelzoo/models/gnn/graphsage_pyg.py"
+PYTHON_SCRIPT_NAME="src/cerebras/modelzoo/models/gnn/pyg_gnn.py"
 CONFIG_PATH=""
 NO_COMPILE_FLAG=0
 # Arguments for PYTHON_SCRIPT_NAME (populated after arg parsing)
@@ -123,7 +123,7 @@ main() {
         return "${parse_status}"
     fi
 
-    log_info "Starting PyG GraphSAGE run"
+    log_info "Starting PyG GNN run"
 
     if ! command -v uv &> /dev/null; then
         log_error "'uv' command not found. Please install uv: https://github.com/astral-sh/uv"

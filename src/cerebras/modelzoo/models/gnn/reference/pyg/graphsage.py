@@ -78,7 +78,11 @@ def main():
 
         # ---- Dataset ----
         train_c = cfg["trainer"]["fit"]["train_dataloader"]
+        sampling_mode = train_c.get("sampling_mode", "neighbor")
         dataset_profile = _resolve_dataset_profile(train_c)
+
+        if args.use_partitions and sampling_mode == "full_graph":
+            raise ValueError("full_graph PyG runs do not support --use-partitions.")
 
         if args.use_partitions:
             from cerebras.modelzoo.models.gnn.reference.pyg.data import (
@@ -104,7 +108,7 @@ def main():
         else:
             data, split_idx = load_dataset(dataset_profile)
 
-        if not args.use_partitions:
+        if sampling_mode == "neighbor" and not args.use_partitions:
             check_pyg_lib()
 
         # Initialize GraphCache
@@ -116,7 +120,11 @@ def main():
 
         is_dist = isinstance(data, tuple)
 
-        if not is_dist:
+        if sampling_mode == "full_graph":
+            cache = None
+            loader_data = data
+            num_nodes = data.num_nodes
+        elif not is_dist:
             cache = GraphCache(data, device, percent=caching_percent)
 
             # Create loader_data without x to avoid duplicate fetching

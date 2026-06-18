@@ -31,31 +31,65 @@ cd "$PROJECT_ROOT"
 source "${PROJECT_ROOT}/common.sh"
 source "${PROJECT_ROOT}/benchmark_scripts/pegasus/gpu_env.sh"
 
-PYG_RUN_CASE="${PYG_RUN_CASE:-throughput_nocache}"
+PYG_BENCHMARK="${PYG_BENCHMARK:-graphsage_ogbn_arxiv}"
+PYG_RUN_PROFILE="${PYG_RUN_PROFILE:-throughput_nocache}"
+PYG_NO_COMPILE="${PYG_NO_COMPILE:-0}"
 NO_COMPILE_ARG=()
 
-case "$PYG_RUN_CASE" in
-    throughput_nocache)
-        CONFIG_PATH="src/cerebras/modelzoo/models/gnn/configs/params_graphsage_ogbn_arxiv_pyg_throughput_nocache.yaml"
+case "$PYG_BENCHMARK" in
+    graphsage_ogbn_arxiv|graphsage_arxiv|arxiv)
+        CONFIG_PREFIX="params_graphsage_ogbn_arxiv"
         ;;
-    throughput_cache)
-        CONFIG_PATH="src/cerebras/modelzoo/models/gnn/configs/params_graphsage_ogbn_arxiv_pyg_throughput_cache.yaml"
+    graphsage_ogbn_products|graphsage_ogbn_product|products|product)
+        CONFIG_PREFIX="params_graphsage_ogbn_products"
         ;;
-    accuracy_nocache)
-        CONFIG_PATH="src/cerebras/modelzoo/models/gnn/configs/params_graphsage_ogbn_arxiv_pyg_accuracy_nocache.yaml"
-        ;;
-    throughput_nocache_nocompile)
-        CONFIG_PATH="src/cerebras/modelzoo/models/gnn/configs/params_graphsage_ogbn_arxiv_pyg_throughput_nocache_nocompile.yaml"
-        NO_COMPILE_ARG=(--no-compile)
+    gcn_ogbn_arxiv|gcn_arxiv)
+        CONFIG_PREFIX="params_gcn_ogbn_arxiv"
         ;;
     *)
-        echo "[ERROR] unknown PYG_RUN_CASE: $PYG_RUN_CASE" >&2
-        echo "[ERROR] expected one of: throughput_nocache throughput_cache accuracy_nocache throughput_nocache_nocompile" >&2
+        echo "[ERROR] unknown PYG_BENCHMARK: $PYG_BENCHMARK" >&2
+        echo "[ERROR] expected one of: graphsage_ogbn_arxiv graphsage_ogbn_products gcn_ogbn_arxiv" >&2
         exit 2
         ;;
 esac
 
-echo "[pbs] PYG_RUN_CASE=$PYG_RUN_CASE"
+case "$PYG_RUN_PROFILE" in
+    throughput_nocache)
+        ;;
+    throughput_cache)
+        if [ "$CONFIG_PREFIX" = "params_gcn_ogbn_arxiv" ]; then
+            echo "[ERROR] PYG_RUN_PROFILE=throughput_cache is not defined for full-batch GCN." >&2
+            echo "[ERROR] expected one of for GCN: throughput_nocache accuracy_nocache" >&2
+            exit 2
+        fi
+        ;;
+    accuracy_nocache)
+        ;;
+    *)
+        echo "[ERROR] unknown PYG_RUN_PROFILE: $PYG_RUN_PROFILE" >&2
+        echo "[ERROR] expected one of: throughput_nocache throughput_cache accuracy_nocache" >&2
+        exit 2
+        ;;
+esac
+
+CONFIG_PATH="src/cerebras/modelzoo/models/gnn/configs/${CONFIG_PREFIX}_pyg_${PYG_RUN_PROFILE}.yaml"
+
+case "$PYG_NO_COMPILE" in
+    1|true|TRUE|yes|YES)
+        NO_COMPILE_ARG=(--no-compile)
+        ;;
+    0|false|FALSE|no|NO)
+        ;;
+    *)
+        echo "[ERROR] unknown PYG_NO_COMPILE value: $PYG_NO_COMPILE" >&2
+        echo "[ERROR] expected boolean value: 0/1, false/true, no/yes" >&2
+        exit 2
+        ;;
+esac
+
+echo "[pbs] PYG_BENCHMARK=$PYG_BENCHMARK"
+echo "[pbs] PYG_RUN_PROFILE=$PYG_RUN_PROFILE"
+echo "[pbs] PYG_NO_COMPILE=$PYG_NO_COMPILE"
 echo "[pbs] CONFIG_PATH=$CONFIG_PATH"
 echo "[pbs] PBS_JOBID=${PBS_JOBID:-}"
 echo "[pbs] PBS_O_WORKDIR=${PBS_O_WORKDIR:-}"
@@ -71,7 +105,7 @@ if ! require_cuda_toolkit; then
 fi
 
 if [ -x "${PROJECT_ROOT}/benchmark_scripts/pegasus/collect_hwinfo.sh" ]; then
-    "${PROJECT_ROOT}/benchmark_scripts/pegasus/collect_hwinfo.sh" "${PYG_RUN_CASE}_${PBS_JOBID:-manual}" || true
+    "${PROJECT_ROOT}/benchmark_scripts/pegasus/collect_hwinfo.sh" "${PYG_BENCHMARK}_${PYG_RUN_PROFILE}_${PBS_JOBID:-manual}" || true
 fi
 
 if [ ! -f "$CONFIG_PATH" ]; then

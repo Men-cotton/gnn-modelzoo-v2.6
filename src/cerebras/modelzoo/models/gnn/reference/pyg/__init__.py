@@ -1,1 +1,1 @@
-"""PyG reference path for GraphSAGE experiments."""
+"""PyG reference path for GPU GNN experiments."""

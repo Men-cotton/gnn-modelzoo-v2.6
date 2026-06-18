@@ -13,6 +13,22 @@ def _get_task_cfg(model_cfg: Dict[str, Any]) -> Dict[str, Any]:
     return model_cfg.get("task", model_cfg)
 
 
+def _is_full_graph_batch(batch: Any) -> bool:
+    return hasattr(batch, "node_idx")
+
+
+def _select_logits_and_labels(model: torch.nn.Module, batch: Any, cache: Optional[Any]):
+    if _is_full_graph_batch(batch):
+        logits = model(batch.x, batch.edge_index)
+        node_idx = batch.node_idx
+        return logits.index_select(0, node_idx), batch.y.index_select(0, node_idx)
+
+    if cache is not None:
+        batch.x = cache.fetch(batch.n_id)
+    logits = model(batch.x, batch.edge_index, batch_size=batch.batch_size)
+    return logits[: batch.batch_size], batch.y[: batch.batch_size]
+
+
 def train_model(
     cfg: Dict[str, Any],
     model: torch.nn.Module,
@@ -148,22 +164,19 @@ def train_model(
 
         # 2. Host-to-Device Transfer (Structure)
         ev_current["h2d_struc"][0].record()
-        # already dropped batch.x in graphsage_pyg.py
         batch = batch.to(device, non_blocking=True)  # pin_memory is enabled
         ev_current["h2d_struc"][1].record()
 
         # 3. Host-to-Device Transfer (Feature Fetch)
         ev_current["h2d_fetch"][0].record()
-        if cache is not None:
+        if cache is not None and not _is_full_graph_batch(batch):
             batch.x = cache.fetch(batch.n_id)
         ev_current["h2d_fetch"][1].record()
 
         # 4. Forward Pass
         ev_current["fwd"][0].record()
         with torch.amp.autocast("cuda", enabled=use_amp):
-            logits = model(batch.x, batch.edge_index, batch_size=batch.batch_size)
-            logits = logits[: batch.batch_size]
-            y = batch.y[: batch.batch_size]
+            logits, y = _select_logits_and_labels(model, batch, cache=None)
 
             if not disable_log_softmax:
                 logits = F.log_softmax(logits, dim=-1)

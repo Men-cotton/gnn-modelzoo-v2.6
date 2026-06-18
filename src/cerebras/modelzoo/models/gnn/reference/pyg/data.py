@@ -1,6 +1,7 @@
 import os
 import sys
 import torch
+from torch.utils.data import DataLoader
 from torch_geometric.loader import NeighborLoader
 from torch_geometric.utils import to_undirected
 from ogb.nodeproppred import PygNodePropPredDataset
@@ -339,6 +340,28 @@ def _resolve_split(split_idx, split_name):
     )
 
 
+def _make_full_graph_loader(data, node_idx, loader_cfg):
+    if loader_cfg.get("drop_last_batch", False):
+        raise ValueError("full_graph PyG loader does not support drop_last_batch=True.")
+
+    graph = Data(
+        x=data.x,
+        edge_index=data.edge_index,
+        y=data.y,
+        node_idx=node_idx,
+    )
+    graph.num_nodes = data.num_nodes
+    graph.batch_size = node_idx.numel()
+
+    return DataLoader(
+        [graph],
+        batch_size=1,
+        shuffle=False,
+        num_workers=0,
+        collate_fn=lambda batch: batch[0],
+    )
+
+
 def make_loaders(data, split_idx, cfg, rank=0, world_size=1):
     # 参照するブロック
     fit = cfg["trainer"]["fit"]
@@ -347,6 +370,28 @@ def make_loaders(data, split_idx, cfg, rank=0, world_size=1):
 
     train_profile = _resolve_dataset_profile(train_c)
     val_profile = _resolve_dataset_profile(val_c)
+
+    train_sampling_mode = train_c.get("sampling_mode", "neighbor")
+    val_sampling_mode = val_c.get("sampling_mode", train_sampling_mode)
+    if train_sampling_mode != val_sampling_mode:
+        raise ValueError(
+            "PyG train and validation loaders must use the same sampling_mode; "
+            f"got train={train_sampling_mode}, val={val_sampling_mode}."
+        )
+
+    if train_sampling_mode == "full_graph":
+        if isinstance(data, tuple):
+            raise ValueError("full_graph PyG loader does not support partitions.")
+        if world_size != 1:
+            raise ValueError("full_graph PyG loader currently supports one GPU only.")
+        train_nodes = _resolve_split(split_idx, train_c.get("split", "train"))
+        val_nodes = _resolve_split(split_idx, val_c.get("split", "val"))
+        return (
+            _make_full_graph_loader(data, train_nodes, train_c),
+            _make_full_graph_loader(data, val_nodes, val_c),
+        )
+    if train_sampling_mode != "neighbor":
+        raise ValueError(f"Unsupported PyG sampling_mode '{train_sampling_mode}'.")
 
     _require_sampler_seed(train_c, "train_dataloader")
     _require_sampler_seed(val_c, "val_dataloader")

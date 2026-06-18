@@ -1,0 +1,10 @@
+extends:
+  - params_gcn_ogbn_arxiv.yaml
+  - components/architectures/input_pipelines/pyg_full_graph.yaml
+  - components/runtime/pyg_amp.yaml
+  - components/runtime/pyg_profile_throughput.yaml
+  - components/runtime/pyg_cache_disabled.yaml
+
+trainer:
+  init:
+    model_dir: "$MODELZOO_ROOT/models/gnn/docs/artifacts/runtime/model_dirs/ogbn_arxiv_gcn_pyg_throughput_nocache"

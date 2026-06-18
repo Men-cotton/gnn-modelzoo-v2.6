@@ -1,0 +1,5 @@
+trainer:
+  init:
+    model:
+      task:
+        to_float16: True

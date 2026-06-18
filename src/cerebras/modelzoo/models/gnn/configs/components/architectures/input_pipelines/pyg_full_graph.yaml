@@ -1,0 +1,22 @@
+trainer:
+  fit:
+    train_dataloader: &pyg_full_graph_loader
+      sampling_mode: full_graph
+      batch_size: 1
+      drop_last_batch: False
+      shuffle: False
+      num_workers: 0
+      persistent_workers: False
+      pin_memory: True
+      prefetch_factor: null
+
+    val_dataloader: &pyg_full_graph_eval_loader
+      <<: *pyg_full_graph_loader
+      split: val
+
+  validate:
+    val_dataloader: *pyg_full_graph_eval_loader
+
+  validate_all:
+    val_dataloaders:
+      - *pyg_full_graph_eval_loader

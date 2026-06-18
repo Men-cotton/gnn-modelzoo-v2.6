@@ -1,6 +1,6 @@
-# Running GraphsAGE with PyG-GNN
+# Running GNNs with PyG-GNN
 
-This document describes how to execute the distributed GraphSAGE training.
+This document describes how to execute PyG-based GPU GNN training.
 
 ## Usage
 
@@ -8,8 +8,15 @@ This document describes how to execute the distributed GraphSAGE training.
 You can run the script normally with `uv run`. This uses a single GPU (or CPU).
 
 ```bash
-uv run src/cerebras/modelzoo/models/gnn/graphsage_pyg.py \
-    --config src/cerebras/modelzoo/models/gnn/configs/params_graphsage_ogbn_arxiv.yaml
+uv run src/cerebras/modelzoo/models/gnn/pyg_gnn.py \
+    --config src/cerebras/modelzoo/models/gnn/configs/params_graphsage_ogbn_arxiv_pyg_throughput_nocache.yaml
+```
+
+For GCN comparison runs, use the full-graph configs:
+
+```bash
+uv run src/cerebras/modelzoo/models/gnn/pyg_gnn.py \
+    --config src/cerebras/modelzoo/models/gnn/configs/params_gcn_ogbn_arxiv_pyg_throughput_nocache.yaml
 ```
 
 ### Multi-GPU (Distributed Data Parallel - DDP)
@@ -18,7 +25,7 @@ To execute on multiple GPUs, you must use `torchrun`. This spawns multiple proce
 **Example: Run on 2 GPUs**
 
 ```bash
-uv run torchrun --nproc_per_node=2 src/cerebras/modelzoo/models/gnn/graphsage_pyg.py \
+uv run torchrun --nproc_per_node=2 src/cerebras/modelzoo/models/gnn/pyg_gnn.py \
     --config src/cerebras/modelzoo/models/gnn/configs/params_graphsage_ogbn_arxiv.yaml
 ```
 
@@ -40,7 +47,7 @@ Specify the process grid dimensions to match your multi-GPU setup. If not specif
 
 **Example: 2 GPUs (1x2 Grid)**
 ```bash
-uv run torchrun --nproc_per_node=2 src/cerebras/modelzoo/models/gnn/graphsage_pyg.py \
+uv run torchrun --nproc_per_node=2 src/cerebras/modelzoo/models/gnn/pyg_gnn.py \
     --config src/cerebras/modelzoo/models/gnn/configs/params_graphsage_ogbn_arxiv.yaml \
     --cagnet-rows 1 \
     --cagnet-cols 2
@@ -76,6 +83,8 @@ The caching behavior is controlled by the `caching_percent` parameter in the `tr
 
 - **Disabled (Default)**: If `caching_percent` is omitted or set to `0.0`, caching is disabled (no auto-detection).
 - **Manual Mode**: Specify a fixed percentage (e.g., `0.1` for 10%) in the config to cache that portion of nodes.
+
+This caching path is only used by neighbor-sampled GraphSAGE runs. Full-graph GCN comparison runs do not use feature caching.
 
 ## Partition Generation
 

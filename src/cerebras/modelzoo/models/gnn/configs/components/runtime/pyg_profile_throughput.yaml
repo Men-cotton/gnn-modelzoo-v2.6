@@ -1,0 +1,5 @@
+trainer:
+  init:
+    model:
+      task:
+        compute_eval_metrics: False
