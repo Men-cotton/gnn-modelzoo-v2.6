@@ -1,0 +1,20 @@
+extends:
+  - components/runtime/default.yaml
+  - components/architectures/gcn.yaml
+  - components/datasets/ogbn_arxiv.yaml
+
+trainer:
+  init:
+    model_dir: "$MODELZOO_ROOT/models/gnn/docs/artifacts/runtime/model_dirs/ogbn_arxiv_gcn"
+
+    optimizer:
+      AdamW:
+        learning_rate: 0.003
+
+    loop:
+      max_steps: 25
+      steps_per_epoch: 1
+      eval_frequency: 1
+
+    logging:
+      log_steps: 1
