@@ -3,8 +3,9 @@
 
 set -euo pipefail
 
-PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# shellcheck source=./common.sh
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+# shellcheck source=../../common.sh
 source "${PROJECT_ROOT}/common.sh"
 
 SCRIPT_NAME="$(basename "$0")"
@@ -36,10 +37,10 @@ main() {
         log_info "Model execution finished."
     )
     local execution_status=$?
-    
+
     if [ "${execution_status}" -ne 0 ]; then
         log_error "Model execution process failed (status: ${execution_status})."
-        return "${execution_status}" 
+        return "${execution_status}"
     fi
 
     log_info "Model execution process completed successfully."

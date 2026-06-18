@@ -1,14 +1,22 @@
 #!/usr/bin/env bash
-# hw_snapshot.sh
+# benchmark_scripts/pegasus/collect_hwinfo.sh
 # Run: lscpu -> nvidia-smi -> nvidia-smi topo -m -> numactl -H (in order)
 # Logs: per-command files + combined log
 
 set -u
 set -o pipefail
 
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd -P)"
+benchmark_dir="$(cd "${script_dir}/.." && pwd -P)"
+base_outdir="${BENCHMARK_HWINFO_DIR:-${benchmark_dir}/hwinfo}"
 ts="$(date +%Y%m%d_%H%M%S)"
 host="$(hostname 2>/dev/null || echo unknown-host)"
-outdir="${1:-hwinfo_${host}_${ts}}"
+outdir_arg="${1:-${host}_${ts}}"
+if [[ "${outdir_arg}" = /* ]]; then
+  outdir="${outdir_arg}"
+else
+  outdir="${base_outdir}/${outdir_arg}"
+fi
 
 mkdir -p "$outdir"
 

@@ -19,4 +19,8 @@ log_error() {
     echo "$(_log_timestamp) [ERROR] $*" >&2
 }
 
+log_warn() {
+    echo "$(_log_timestamp) [WARN] $*" >&2
+}
+
 SHARED_MODEL_SUBDIR="src/cerebras/modelzoo/models/gnn"

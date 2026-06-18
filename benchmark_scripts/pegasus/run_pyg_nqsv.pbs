@@ -1,0 +1,82 @@
+#!/bin/bash
+#PBS -A AC2
+#PBS -q gpu
+#PBS -b 1
+#PBS -l elapstim_req=02:00:00
+#PBS -M mencotton0410@gmail.com
+#PBS -m e
+
+set -euo pipefail
+
+cd "$PBS_O_WORKDIR" || exit 1
+
+find_project_root() {
+    local dir="$PWD"
+    while [ "$dir" != "/" ]; do
+        if [ -f "$dir/common.sh" ]; then
+            printf '%s\n' "$dir"
+            return 0
+        fi
+        dir="$(dirname "$dir")"
+    done
+    return 1
+}
+
+PROJECT_ROOT="$(find_project_root)" || {
+    echo "[ERROR] project root not found from PBS_O_WORKDIR=${PBS_O_WORKDIR:-}" >&2
+    exit 2
+}
+cd "$PROJECT_ROOT"
+
+source "${PROJECT_ROOT}/common.sh"
+source "${PROJECT_ROOT}/benchmark_scripts/pegasus/gpu_env.sh"
+
+PYG_RUN_CASE="${PYG_RUN_CASE:-throughput_nocache}"
+NO_COMPILE_ARG=()
+
+case "$PYG_RUN_CASE" in
+    throughput_nocache)
+        CONFIG_PATH="src/cerebras/modelzoo/models/gnn/configs/params_graphsage_ogbn_arxiv_pyg_throughput_nocache.yaml"
+        ;;
+    throughput_cache)
+        CONFIG_PATH="src/cerebras/modelzoo/models/gnn/configs/params_graphsage_ogbn_arxiv_pyg_throughput_cache.yaml"
+        ;;
+    accuracy_nocache)
+        CONFIG_PATH="src/cerebras/modelzoo/models/gnn/configs/params_graphsage_ogbn_arxiv_pyg_accuracy_nocache.yaml"
+        ;;
+    throughput_nocache_nocompile)
+        CONFIG_PATH="src/cerebras/modelzoo/models/gnn/configs/params_graphsage_ogbn_arxiv_pyg_throughput_nocache_nocompile.yaml"
+        NO_COMPILE_ARG=(--no-compile)
+        ;;
+    *)
+        echo "[ERROR] unknown PYG_RUN_CASE: $PYG_RUN_CASE" >&2
+        echo "[ERROR] expected one of: throughput_nocache throughput_cache accuracy_nocache throughput_nocache_nocompile" >&2
+        exit 2
+        ;;
+esac
+
+echo "[pbs] PYG_RUN_CASE=$PYG_RUN_CASE"
+echo "[pbs] CONFIG_PATH=$CONFIG_PATH"
+echo "[pbs] PBS_JOBID=${PBS_JOBID:-}"
+echo "[pbs] PBS_O_WORKDIR=${PBS_O_WORKDIR:-}"
+echo "[pbs] hostname=$(hostname 2>/dev/null || echo unknown)"
+
+if ! load_cuda_module; then
+    echo "[WARN] CUDA module load failed. Stopping before production run." >&2
+    exit 3
+fi
+if ! require_cuda_toolkit; then
+    echo "[WARN] CUDA toolkit is not visible. Stopping before production run." >&2
+    exit 3
+fi
+
+if [ -x "${PROJECT_ROOT}/benchmark_scripts/pegasus/collect_hwinfo.sh" ]; then
+    "${PROJECT_ROOT}/benchmark_scripts/pegasus/collect_hwinfo.sh" "${PYG_RUN_CASE}_${PBS_JOBID:-manual}" || true
+fi
+
+if [ ! -f "$CONFIG_PATH" ]; then
+    echo "[ERROR] config not found: $CONFIG_PATH" >&2
+    exit 2
+fi
+
+"${PROJECT_ROOT}/benchmark_scripts/pegasus/run_pyg.sh" --config "$CONFIG_PATH" "${NO_COMPILE_ARG[@]}"
