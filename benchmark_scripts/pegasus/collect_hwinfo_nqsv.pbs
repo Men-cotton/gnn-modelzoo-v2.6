@@ -1,0 +1,36 @@
+#!/bin/bash
+#PBS -A AC2
+#PBS -q gpu
+#PBS -b 1
+#PBS -l elapstim_req=00:10:00
+#PBS -M mencotton0410@gmail.com
+#PBS -m e
+
+set -euo pipefail
+
+cd "$PBS_O_WORKDIR" || exit 1
+
+find_project_root() {
+    local dir="$PWD"
+    while [ "$dir" != "/" ]; do
+        if [ -f "$dir/common.sh" ]; then
+            printf '%s\n' "$dir"
+            return 0
+        fi
+        dir="$(dirname "$dir")"
+    done
+    return 1
+}
+
+PROJECT_ROOT="$(find_project_root)" || {
+    echo "[ERROR] project root not found from PBS_O_WORKDIR=${PBS_O_WORKDIR:-}" >&2
+    exit 2
+}
+cd "$PROJECT_ROOT"
+
+echo "[pbs] hwinfo job"
+echo "[pbs] PBS_JOBID=${PBS_JOBID:-}"
+echo "[pbs] PBS_O_WORKDIR=${PBS_O_WORKDIR:-}"
+echo "[pbs] hostname=$(hostname 2>/dev/null || echo unknown)"
+
+"${PROJECT_ROOT}/benchmark_scripts/pegasus/collect_hwinfo.sh" "pyg_all_${PBS_JOBID:-manual}"

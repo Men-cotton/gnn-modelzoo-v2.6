@@ -104,10 +104,6 @@ if ! require_cuda_toolkit; then
     exit 3
 fi
 
-if [ -x "${PROJECT_ROOT}/benchmark_scripts/pegasus/collect_hwinfo.sh" ]; then
-    "${PROJECT_ROOT}/benchmark_scripts/pegasus/collect_hwinfo.sh" "${PYG_BENCHMARK}_${PYG_RUN_PROFILE}_${PBS_JOBID:-manual}" || true
-fi
-
 if [ ! -f "$CONFIG_PATH" ]; then
     echo "[ERROR] config not found: $CONFIG_PATH" >&2
     exit 2

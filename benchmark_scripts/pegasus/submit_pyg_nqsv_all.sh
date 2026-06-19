@@ -6,6 +6,7 @@ set -euo pipefail
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd -P)"
 project_root="$(cd "${script_dir}/../.." && pwd -P)"
 pbs_script="${script_dir}/run_pyg_nqsv.pbs"
+hwinfo_pbs_script="${script_dir}/collect_hwinfo_nqsv.pbs"
 configs_dir="${project_root}/src/cerebras/modelzoo/models/gnn/configs"
 
 dry_run=0
@@ -16,6 +17,7 @@ usage() {
 Usage: $(basename "$0") [--dry-run] [--no-compile]
 
 Submits the eight PyG configs supported by run_pyg_nqsv.pbs.
+Hardware info is collected once through a separate GPU PBS job.
 Set PYG_NO_COMPILE=1 or pass --no-compile to disable torch.compile.
 EOF
 }
@@ -47,10 +49,25 @@ if [[ ! -f "${pbs_script}" ]]; then
     exit 2
 fi
 
+if [[ ! -f "${hwinfo_pbs_script}" ]]; then
+    echo "[ERROR] hardware info PBS script not found: ${hwinfo_pbs_script}" >&2
+    exit 2
+fi
+
 if [[ "${dry_run}" -eq 0 ]] && ! command -v qsub >/dev/null 2>&1; then
     echo "[ERROR] qsub command not found. Use --dry-run to print commands." >&2
     exit 1
 fi
+
+submit_hwinfo_job() {
+    if [[ "${dry_run}" -eq 1 ]]; then
+        printf "qsub '%s'\n" "${hwinfo_pbs_script}"
+        return 0
+    fi
+
+    echo "[submit] hardware info"
+    qsub "${hwinfo_pbs_script}"
+}
 
 submit_job() {
     local benchmark="$1"
@@ -72,6 +89,8 @@ submit_job() {
     echo "[submit] ${benchmark} ${profile}"
     qsub -v "${vars}" "${pbs_script}"
 }
+
+submit_hwinfo_job
 
 submit_job graphsage_ogbn_arxiv throughput_nocache params_graphsage_ogbn_arxiv
 submit_job graphsage_ogbn_arxiv throughput_cache params_graphsage_ogbn_arxiv
