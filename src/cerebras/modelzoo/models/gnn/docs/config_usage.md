@@ -203,11 +203,11 @@ The model's wall-clock performance is likely dominated by **Data Transfer (Host-
     1.  **Batch Composition**: If `shuffle: True`, this seed is used to initialize the random number generator that shuffles the order of target nodes (`_order_targets` in `neighbor_sampling.py`).
     2.  **Neighbor Selection**: It is used in the `_deterministic_choice` method to deterministically select a subset of neighbors when the number of neighbors exceeds the specified `fanout`.
 
-## 9. Investigation of `pyg_gnn` Scripts (Comparison with `cszoo`)
+## 9. Investigation of PyG Scripts (Comparison with `cszoo`)
 
-The directory `src/cerebras/modelzoo/models/gnn/reference/pyg` contains a separate set of scripts (entry point: `pyg_gnn.py`) intended for running GNNs using standard PyTorch Geometric (PyG) implementations, likely for benchmarking or reference purposes.
+The directory `src/cerebras/modelzoo/models/gnn/reference/pyg` contains a separate set of scripts (entry points: `pyg_graphsage.py` and `pyg_gcn.py`) intended for running GNNs using standard PyTorch Geometric (PyG) implementations, likely for benchmarking or reference purposes.
 
-This section highlights the key differences between the standard `cszoo` flow (investigated above) and this `pyg_gnn` script flow.
+This section highlights the key differences between the standard `cszoo` flow (investigated above) and this PyG script flow.
 
 ### 9.1. Model Architecture Differences
 
@@ -216,7 +216,7 @@ This section highlights the key differences between the standard `cszoo` flow (i
     *   **Implementation**: Cerebras custom implementation of GraphSAGE.
     *   **Config Usage**: `graphsage_num_layers` from the YAML is correctly passed to the model constructor.
 
-*   **`pyg_gnn` Flow (`pyg_gnn.py`)**:
+*   **PyG Flow (`pyg_graphsage.py` / `pyg_gcn.py`)**:
     *   **Class**: `src/cerebras/modelzoo/models/gnn/reference/pyg/model.py` (`GraphSAGEWrapper` or `GCNWrapper`) wrapping standard PyTorch Geometric layers.
     *   **Implementation**: Standard PyTorch Geometric implementation.
     *   **Config Usage**:
@@ -230,15 +230,15 @@ This section highlights the key differences between the standard `cszoo` flow (i
     *   **Mechanism**: Custom implementation designed to yield `GraphSAGEBatch` objects compatible with the Cerebras execution model.
     *   **Logic**: Manually handles sampling logic and determinism.
 
-*   **`pyg_gnn` Flow**:
+*   **PyG Flow**:
     *   **Loader**: `src/cerebras/modelzoo/models/gnn/reference/pyg/data.py` uses `torch_geometric.loader.NeighborLoader` for neighbor-sampled GraphSAGE, and a single full-graph `Data` batch for GCN comparison runs.
     *   **Mechanism**: Standard PyG loader for neighbor sampling; direct full-graph execution for GCN.
     *   **Seed**: For NeighborLoader runs, `sampler_seed` seeds a `torch.Generator`. Full-graph GCN runs do not perform neighbor sampling.
 
 ### 9.3. Summary of Differences
 
-| Feature | `cszoo` Flow | `pyg_gnn` Flow |
+| Feature | `cszoo` Flow | PyG Flow |
 | :--- | :--- | :--- |
-| **Entry Point** | `cszoo fit` | `pyg_gnn.py` |
+| **Entry Point** | `cszoo fit` | `pyg_graphsage.py` / `pyg_gcn.py` |
 | **Model Implementation** | Custom architecture modules | PyG modules such as `GraphSAGE` and `GCNConv` |
 | **Data Loader** | Custom architecture-specific data processors | PyG `NeighborLoader` for GraphSAGE, full-graph `Data` batch for GCN |

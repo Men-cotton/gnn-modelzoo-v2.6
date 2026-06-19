@@ -2,6 +2,7 @@ import argparse
 import os
 import sys
 import torch
+from cerebras.modelzoo.config.types import resolve_path
 from cerebras.modelzoo.models.gnn.reference.pyg.utils import (
     set_seed,
     load_cfg,
@@ -25,24 +26,50 @@ from cerebras.modelzoo.models.gnn.reference.pyg.caching import GraphCache
 from torch_geometric.data import Data
 
 
-def main():
+def _architecture_type(cfg):
+    architecture = cfg["trainer"]["init"]["model"]["architecture"]
+    return str(architecture.get("type", "graphsage")).lower()
+
+
+def _validate_expected_architecture(cfg, expected_architecture):
+    if expected_architecture is None:
+        return
+    architecture_type = _architecture_type(cfg)
+    expected_architecture = expected_architecture.lower()
+    if architecture_type != expected_architecture:
+        raise ValueError(
+            f"PyG {expected_architecture} entry point received a "
+            f"'{architecture_type}' config."
+        )
+
+
+def main(expected_architecture=None, enable_graphsage_options=True):
     ap = argparse.ArgumentParser()
     ap.add_argument("--config", required=True, help="path to YAML")
-    ap.add_argument("--cagnet-rows", type=int, default=1, help="CAGNET grid rows")
-    ap.add_argument("--cagnet-cols", type=int, default=1, help="CAGNET grid cols")
-    ap.add_argument(
-        "--cagnet-rep", type=int, default=1, help="CAGNET replication factor"
-    )
-    ap.add_argument(
-        "--force-cagnet",
-        action="store_true",
-        help="Force usage of CagnetSAGE even if topology is 1x1x1",
-    )
-    ap.add_argument(
-        "--use-partitions",
-        action="store_true",
-        help="Load offline partitions for training",
-    )
+    if enable_graphsage_options:
+        ap.add_argument("--cagnet-rows", type=int, default=1, help="CAGNET grid rows")
+        ap.add_argument("--cagnet-cols", type=int, default=1, help="CAGNET grid cols")
+        ap.add_argument(
+            "--cagnet-rep", type=int, default=1, help="CAGNET replication factor"
+        )
+        ap.add_argument(
+            "--force-cagnet",
+            action="store_true",
+            help="Force usage of CagnetSAGE even if topology is 1x1x1",
+        )
+        ap.add_argument(
+            "--use-partitions",
+            action="store_true",
+            help="Load offline partitions for training",
+        )
+    else:
+        ap.set_defaults(
+            cagnet_rows=1,
+            cagnet_cols=1,
+            cagnet_rep=1,
+            force_cagnet=False,
+            use_partitions=False,
+        )
     ap.add_argument(
         "--deterministic",
         action="store_true",
@@ -51,6 +78,8 @@ def main():
 
     args = ap.parse_args()
     ensure_pickle_friendly_load()
+    cfg = load_cfg(args.config)
+    _validate_expected_architecture(cfg, expected_architecture)
 
     # Initialize DDP
     rank, world_size, device = setup_ddp()
@@ -64,9 +93,9 @@ def main():
             print(f"[Info] Device: {device}")
 
     try:
-        cfg = load_cfg(args.config)
         init = cfg["trainer"]["init"]
-        model_dir = init["model_dir"]
+        model_dir = resolve_path(init["model_dir"])
+        init["model_dir"] = model_dir
 
         # Only rank 0 should probably create directories if they might conflict,
         # but os.makedirs(exist_ok=True) is relatively safe.

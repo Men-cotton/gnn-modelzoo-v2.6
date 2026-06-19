@@ -18,7 +18,7 @@ source "${PEGASUS_DIR}/gpu_env.sh"
 
 SCRIPT_NAME="$(basename "$0")"
 
-PYTHON_SCRIPT_NAME="src/cerebras/modelzoo/models/gnn/pyg_gnn.py"
+PYTHON_SCRIPT_NAME=""
 CONFIG_PATH=""
 NO_COMPILE_FLAG=0
 # Arguments for PYTHON_SCRIPT_NAME (populated after arg parsing)
@@ -65,12 +65,27 @@ parse_args() {
     fi
 
     PYTHON_SCRIPT_ARGS=("--config" "${CONFIG_PATH}")
+
+    case "$(basename "${CONFIG_PATH}")" in
+        params_graphsage_*)
+            PYTHON_SCRIPT_NAME="src/cerebras/modelzoo/models/gnn/pyg_graphsage.py"
+            ;;
+        params_gcn_*)
+            PYTHON_SCRIPT_NAME="src/cerebras/modelzoo/models/gnn/pyg_gcn.py"
+            ;;
+        *)
+            log_error "Unsupported PyG config for script selection: ${CONFIG_PATH}"
+            log_error "Expected config basename to start with params_graphsage_ or params_gcn_"
+            return 2
+            ;;
+    esac
 }
 
 log_run_metadata() {
     local venv_python="${PROJECT_ROOT}/.venv/bin/python"
 
     log_info "Run metadata: script=${SCRIPT_NAME}"
+    log_info "Run metadata: python_script=${PYTHON_SCRIPT_NAME}"
     log_info "Run metadata: project_root=${PROJECT_ROOT}"
     log_info "Run metadata: config=${CONFIG_PATH}"
     log_info "Run metadata: no_compile=${NO_COMPILE_FLAG}"

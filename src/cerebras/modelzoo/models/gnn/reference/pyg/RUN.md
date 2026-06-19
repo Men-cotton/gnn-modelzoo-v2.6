@@ -8,14 +8,14 @@ This document describes how to execute PyG-based GPU GNN training.
 You can run the script normally with `uv run`. This uses a single GPU (or CPU).
 
 ```bash
-uv run src/cerebras/modelzoo/models/gnn/pyg_gnn.py \
+uv run src/cerebras/modelzoo/models/gnn/pyg_graphsage.py \
     --config src/cerebras/modelzoo/models/gnn/configs/params_graphsage_ogbn_arxiv_pyg_throughput_nocache.yaml
 ```
 
 For GCN comparison runs, use the full-graph configs:
 
 ```bash
-uv run src/cerebras/modelzoo/models/gnn/pyg_gnn.py \
+uv run src/cerebras/modelzoo/models/gnn/pyg_gcn.py \
     --config src/cerebras/modelzoo/models/gnn/configs/params_gcn_ogbn_arxiv_pyg_throughput_nocache.yaml
 ```
 
@@ -25,7 +25,7 @@ To execute on multiple GPUs, you must use `torchrun`. This spawns multiple proce
 **Example: Run on 2 GPUs**
 
 ```bash
-uv run torchrun --nproc_per_node=2 src/cerebras/modelzoo/models/gnn/pyg_gnn.py \
+uv run torchrun --nproc_per_node=2 src/cerebras/modelzoo/models/gnn/pyg_graphsage.py \
     --config src/cerebras/modelzoo/models/gnn/configs/params_graphsage_ogbn_arxiv.yaml
 ```
 
@@ -47,7 +47,7 @@ Specify the process grid dimensions to match your multi-GPU setup. If not specif
 
 **Example: 2 GPUs (1x2 Grid)**
 ```bash
-uv run torchrun --nproc_per_node=2 src/cerebras/modelzoo/models/gnn/pyg_gnn.py \
+uv run torchrun --nproc_per_node=2 src/cerebras/modelzoo/models/gnn/pyg_graphsage.py \
     --config src/cerebras/modelzoo/models/gnn/configs/params_graphsage_ogbn_arxiv.yaml \
     --cagnet-rows 1 \
     --cagnet-cols 2

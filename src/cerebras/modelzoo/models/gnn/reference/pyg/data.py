@@ -334,6 +334,9 @@ def _resolve_split(split_idx, split_name):
     key = split_name.lower()
     if key in split_idx:
         return split_idx[key]
+    alias = {"val": "valid", "valid": "val"}.get(key)
+    if alias is not None and alias in split_idx:
+        return split_idx[alias]
     raise KeyError(
         f"Split '{split_name}' not available in dataset. "
         f"Available splits: {', '.join(sorted(split_idx.keys()))}"
