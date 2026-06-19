@@ -30,7 +30,7 @@ usage() {
     cat <<EOF
 Usage: ${SCRIPT_NAME} --target-env <gpu|csx>
 
-  gpu  Pegasus/H100 setup. Requires module load cuda and a visible CUDA toolkit.
+  gpu  Pegasus/H100 setup. Tries module load cuda when available; requires a visible CUDA toolkit.
   csx  Cerebras/CSX setup. Allows CPU torch fallback because no local GPU is expected.
 EOF
 }
@@ -125,13 +125,12 @@ main() {
 
     if [[ "${TARGET_ENV}" = "gpu" ]]; then
         load_pegasus_gpu_env
-        log_step "Loading CUDA toolkit module"
+        log_step "Preparing CUDA toolkit environment"
         if ! load_cuda_module; then
-            log_error "CUDA module load failed. Run GPU setup on a Pegasus GPU environment with a visible CUDA module."
-            return 3
+            log_warn "CUDA module load failed or module command is unavailable; continuing with the current environment."
         fi
         if ! require_cuda_toolkit; then
-            log_error "CUDA toolkit is required for the production PyG GPU benchmark setup."
+            log_error "CUDA toolkit is required for the production PyG GPU benchmark setup. Set CUDA_HOME/CUDA_TOOLKIT_ROOT_DIR or make nvcc visible."
             return 3
         fi
     else

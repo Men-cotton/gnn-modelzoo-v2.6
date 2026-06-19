@@ -45,7 +45,7 @@ require_cuda_toolkit() {
     local cuda_root
     cuda_root="$(detect_cuda_toolkit_root)"
     if [[ -z "${cuda_root}" ]]; then
-        log_warn "CUDA toolkit is not visible after loading the CUDA module."
+        log_warn "CUDA toolkit is not visible."
         log_warn "Expected nvcc, CUDA_HOME, or CUDA_TOOLKIT_ROOT_DIR. Refusing to start a production GPU run."
         return 1
     fi
