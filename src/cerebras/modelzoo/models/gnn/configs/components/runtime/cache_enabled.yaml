@@ -1,4 +1,4 @@
 trainer:
   fit:
     train_dataloader:
-      caching_percent: 1.0
+      cache_fraction: 1.0

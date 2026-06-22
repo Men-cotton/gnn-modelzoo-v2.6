@@ -26,17 +26,17 @@ trainer:
 
     val_dataloader:
       num_workers: 0
-      caching_percent: null
+      cache_fraction: null
       static_batch_cache_size: 1
 
   validate:
     val_dataloader:
       num_workers: 0
-      caching_percent: null
+      cache_fraction: null
       static_batch_cache_size: 1
 
   validate_all:
     val_dataloaders:
       - num_workers: 0
-        caching_percent: null
+        cache_fraction: null
         static_batch_cache_size: 1

@@ -7,13 +7,13 @@ class GraphCache:
     Mimics PaGraph's caching strategy by storing features of high-degree nodes on GPU.
     """
 
-    def __init__(self, data, device, percent=None):
+    def __init__(self, data, device, cache_fraction=None):
         """
         Args:
             data (Data): PyG Data object containing x (features) and edge_index.
             device (torch.device): Device to cache features on.
-            percent (float, optional): Percentage of nodes to cache (0.0 to 1.0).
-                                     If None, auto-detect based on available memory.
+            cache_fraction (float, optional): Fraction of nodes to cache (0.0 to 1.0).
+                                             If None, auto-detect based on available memory.
         """
         self.device = device
         self.num_nodes = data.num_nodes
@@ -31,11 +31,11 @@ class GraphCache:
         self.node_to_cache_idx = None
         self.is_cached = None
 
-        self.auto_cache(data, percent)
+        self.auto_cache(data, cache_fraction)
 
-    def auto_cache(self, data, percent=None):
+    def auto_cache(self, data, cache_fraction=None):
         # Determine Cache Size
-        if percent is None:
+        if cache_fraction is None:
             # Simple heuristic: avail memory * 0.8 / feature size
             if self.device.type == "cuda":
                 device_idx = (
@@ -53,28 +53,28 @@ class GraphCache:
                 )  # float32 bytes
 
                 if avail_mem <= 0:
-                    percent = 0.0
+                    cache_fraction = 0.0
                 elif avail_mem >= required_mem_full:
-                    percent = 1.0
+                    cache_fraction = 1.0
                 else:
-                    percent = avail_mem / required_mem_full
+                    cache_fraction = avail_mem / required_mem_full
 
                 print(
                     f"[GraphCache] Auto-detected memory. Free: {free_mem/1e9:.2f}GB. "
-                    f"Target Cache: {percent*100:.1f}%"
+                    f"Target Cache: {cache_fraction*100:.1f}%"
                 )
             else:
-                percent = 0.0
+                cache_fraction = 0.0
 
-        percent = max(0.0, min(1.0, percent))
-        num_cache = int(self.num_nodes * percent)
+        cache_fraction = max(0.0, min(1.0, cache_fraction))
+        num_cache = int(self.num_nodes * cache_fraction)
 
         if num_cache == 0:
             print("[GraphCache] Caching disabled (0 nodes).")
             return
 
         print(
-            f"[GraphCache] Caching {num_cache} / {self.num_nodes} nodes ({percent*100:.1f}%) on {self.device}..."
+            f"[GraphCache] Caching {num_cache} / {self.num_nodes} nodes ({cache_fraction*100:.1f}%) on {self.device}..."
         )
 
         # Sort by out-degree (frequency of being a source/neighbor)

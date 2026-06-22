@@ -141,11 +141,11 @@ def main(expected_architecture=None, enable_graphsage_options=True):
             check_pyg_lib()
 
         # Initialize GraphCache
-        # Get caching percent from config, default to 0.0 to disable auto-caching
+        # Get cache fraction from config, default to 0.0 to disable auto-caching
         train_dataloader_cfg = (
             cfg.get("trainer", {}).get("fit", {}).get("train_dataloader", {})
         )
-        caching_percent = train_dataloader_cfg.get("caching_percent", 0.0)
+        cache_fraction = train_dataloader_cfg.get("cache_fraction", 0.0)
 
         is_dist = isinstance(data, tuple)
 
@@ -154,7 +154,7 @@ def main(expected_architecture=None, enable_graphsage_options=True):
             loader_data = data
             num_nodes = data.num_nodes
         elif not is_dist:
-            cache = GraphCache(data, device, percent=caching_percent)
+            cache = GraphCache(data, device, cache_fraction=cache_fraction)
 
             # Create loader_data without x to avoid duplicate fetching
             loader_data = Data()

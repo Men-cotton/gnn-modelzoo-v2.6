@@ -13,7 +13,7 @@ trainer:
         pin_memory: True
         sampler_seed: 42
       shuffle: True
-      caching_percent: null
+      cache_fraction: null
       split: train
 
     val_dataloader: &neighbor_eval_loader

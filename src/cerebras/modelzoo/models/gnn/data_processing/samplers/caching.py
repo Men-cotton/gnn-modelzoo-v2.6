@@ -7,13 +7,13 @@ class GraphCache:
     Mimics PaGraph's caching strategy by storing features of high-degree nodes on accelerator.
     """
 
-    def __init__(self, data, device, percent=None):
+    def __init__(self, data, device, cache_fraction=None):
         """
         Args:
             data (Data): PyG Data object containing x (features) and edge_index.
             device (torch.device): Device to cache features on.
-            percent (float, optional): Percentage of nodes to cache (0.0 to 1.0).
-                                     If None, defaults to 0.0 (disabled) unless explicitly set.
+            cache_fraction (float, optional): Fraction of nodes to cache (0.0 to 1.0).
+                                             If None, defaults to 0.0 (disabled) unless explicitly set.
         """
         self.device = device
         self.num_nodes = data.num_nodes
@@ -31,24 +31,24 @@ class GraphCache:
         self.node_to_cache_idx = None
         self.is_cached = None
 
-        self.auto_cache(data, percent)
+        self.auto_cache(data, cache_fraction)
 
-    def auto_cache(self, data, percent=None):
+    def auto_cache(self, data, cache_fraction=None):
         # Determine Cache Size
-        if percent is None:
+        if cache_fraction is None:
             # We cannot reliably auto-detect memory without torch.cuda if we want to abide by non-cuda strictness.
             # Defaulting to 0.0 as per plan.
-            percent = 0.0
+            cache_fraction = 0.0
 
-        percent = max(0.0, min(1.0, percent))
-        num_cache = int(self.num_nodes * percent)
+        cache_fraction = max(0.0, min(1.0, cache_fraction))
+        num_cache = int(self.num_nodes * cache_fraction)
 
         if num_cache == 0:
             print("[GraphCache] Caching disabled (0 nodes).")
             return
 
         print(
-            f"[GraphCache] Caching {num_cache} / {self.num_nodes} nodes ({percent*100:.1f}%) on {self.device}..."
+            f"[GraphCache] Caching {num_cache} / {self.num_nodes} nodes ({cache_fraction*100:.1f}%) on {self.device}..."
         )
 
         # Sort by out-degree (frequency of being a source/neighbor)

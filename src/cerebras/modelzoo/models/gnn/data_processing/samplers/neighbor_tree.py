@@ -355,7 +355,7 @@ class NeighborSamplingDataProcessor(BaseGraphDataSource):
         sampler_seed: int,
         num_workers: int,
         pad_id: int,
-        caching_percent: Optional[float] = None,
+        cache_fraction: Optional[float] = None,
         static_batch_cache_size: int = 0,
     ):
         super().__init__(
@@ -375,7 +375,7 @@ class NeighborSamplingDataProcessor(BaseGraphDataSource):
             context=f"{self.__class__.__name__}.num_workers",
         )
         self.pad_id = pad_id
-        self.caching_percent = caching_percent
+        self.cache_fraction = cache_fraction
         self.static_batch_cache_size = static_batch_cache_size
         self.graph_cache = None
 
@@ -387,7 +387,7 @@ class NeighborSamplingDataProcessor(BaseGraphDataSource):
         split_mask = split_masks[split_key]
 
         # Initialize GraphCache if enabled
-        if self.caching_percent is not None and self.graph_cache is None:
+        if self.cache_fraction is not None and self.graph_cache is None:
             # Determine target caching device
             if cstorch.use_cs():
                 cache_device = torch.device("cpu")
@@ -407,7 +407,7 @@ class NeighborSamplingDataProcessor(BaseGraphDataSource):
             # Construct a minimal Data object for initialization
             data = Data(x=features, edge_index=edge_index, num_nodes=features.size(0))
             self.graph_cache = GraphCache(
-                data, cache_device, percent=self.caching_percent
+                data, cache_device, cache_fraction=self.cache_fraction
             )
 
         dataset = GraphSAGENeighborSamplerDataset(

@@ -79,10 +79,10 @@ uv run setup.py install
 This model integrates **PaGraph** caching strategy to speed up training on single and multi-GPU setups.
 It automatically caches frequently accessed node features on the GPU to minimize PCIe bandwidth usage.
 
-The caching behavior is controlled by the `caching_percent` parameter in the `train_dataloader` section of the YAML configuration file.
+The caching behavior is controlled by the `cache_fraction` parameter in the `train_dataloader` section of the YAML configuration file.
 
-- **Disabled (Default)**: If `caching_percent` is omitted or set to `0.0`, caching is disabled (no auto-detection).
-- **Manual Mode**: Specify a fixed percentage (e.g., `0.1` for 10%) in the config to cache that portion of nodes.
+- **Disabled (Default)**: If `cache_fraction` is omitted or set to `0.0`, caching is disabled (no auto-detection).
+- **Manual Mode**: Specify a fixed fraction (e.g., `0.1` for 10%) in the config to cache that portion of nodes.
 
 This caching path is only used by neighbor-sampled GraphSAGE runs. Full-graph GCN comparison runs do not use feature caching.
 
