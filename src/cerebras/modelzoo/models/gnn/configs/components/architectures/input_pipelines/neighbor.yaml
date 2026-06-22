@@ -7,7 +7,7 @@ trainer:
         fanouts: [15, 10, 5]
         batch_size: 4096
         drop_last_batch: False
-        num_workers: 8
+        num_workers: 40
         prefetch_factor: 2
         persistent_workers: True
         pin_memory: True

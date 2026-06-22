@@ -59,6 +59,11 @@ if [[ "${dry_run}" -eq 0 ]] && ! command -v qsub >/dev/null 2>&1; then
     exit 1
 fi
 
+validate_num_workers() {
+    "${project_root}/benchmark_scripts/validate_num_workers.sh" \
+        "${configs_dir}"
+}
+
 submit_hwinfo_job() {
     if [[ "${dry_run}" -eq 1 ]]; then
         printf "qsub '%s'\n" "${hwinfo_pbs_script}"
@@ -89,6 +94,8 @@ submit_job() {
     echo "[submit] ${benchmark} ${profile}"
     qsub -v "${vars}" "${pbs_script}"
 }
+
+validate_num_workers
 
 submit_hwinfo_job
 

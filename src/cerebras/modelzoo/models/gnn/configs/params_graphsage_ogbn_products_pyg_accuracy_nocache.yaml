@@ -1,8 +1,8 @@
 extends:
   - params_graphsage_ogbn_products.yaml
   - components/architectures/input_pipelines/neighbor.yaml
-  - components/runtime/pyg_profile_accuracy.yaml
-  - components/runtime/pyg_cache_disabled.yaml
+  - components/runtime/profile_accuracy.yaml
+  - components/runtime/cache_disabled.yaml
 
 trainer:
   init:

@@ -1,0 +1,7 @@
+extends:
+  - params_graphsage_ogbn_products.yaml
+  - components/runtime/profile_accuracy.yaml
+
+trainer:
+  init:
+    model_dir: "$MODELZOO_ROOT/../../../model_dirs/ogbn_products_graphsage_accuracy"
