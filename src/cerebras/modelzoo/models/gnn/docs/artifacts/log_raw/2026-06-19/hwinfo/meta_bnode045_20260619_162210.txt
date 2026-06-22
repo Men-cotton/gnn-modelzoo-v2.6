@@ -1,9 +1,0 @@
-timestamp: 2026-06-19T16:22:10+09:00
-hostname : bnode045
-user     : watanuki
-pwd      : /work/1/AC2/watanuki/gnn-modelzoo-v2.6
-uname    : Linux bnode045 5.15.0-173-generic #183-Ubuntu SMP Fri Mar 6 13:29:34 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
-SLURM_JOB_ID      : 
-SLURM_NODELIST    : 
-SLURM_JOB_PARTITION: 
-
