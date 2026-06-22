@@ -8,8 +8,8 @@ __pycache__/
 /.vscode
 
 # GNN generated artifacts
+/model_dirs/
 /src/cerebras/modelzoo/models/gnn/data/
-/src/cerebras/modelzoo/models/gnn/docs/artifacts/runtime/
 /src/gnn_on_modelzoo.egg-info/
 
 # Local runtime and workspace state

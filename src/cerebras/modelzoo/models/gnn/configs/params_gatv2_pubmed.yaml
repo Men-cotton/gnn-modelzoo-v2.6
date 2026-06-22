@@ -5,7 +5,7 @@ extends:
 
 trainer:
   init:
-    model_dir: "$MODELZOO_ROOT/models/gnn/docs/artifacts/runtime/model_dirs/PubMed_gatv2"
+    model_dir: "$MODELZOO_ROOT/../../../model_dirs/PubMed_gatv2"
 
     optimizer:
       AdamW:

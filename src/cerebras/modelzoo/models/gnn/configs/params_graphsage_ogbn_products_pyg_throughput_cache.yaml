@@ -6,4 +6,4 @@ extends:
 
 trainer:
   init:
-    model_dir: "$MODELZOO_ROOT/models/gnn/docs/artifacts/runtime/model_dirs/ogbn_products_graphsage_pyg_throughput_cache"
+    model_dir: "$MODELZOO_ROOT/../../../model_dirs/ogbn_products_graphsage_pyg_throughput_cache"

@@ -7,4 +7,4 @@ extends:
 
 trainer:
   init:
-    model_dir: "$MODELZOO_ROOT/models/gnn/docs/artifacts/runtime/model_dirs/ogbn_arxiv_gcn_pyg_accuracy_nocache"
+    model_dir: "$MODELZOO_ROOT/../../../model_dirs/ogbn_arxiv_gcn_pyg_accuracy_nocache"
