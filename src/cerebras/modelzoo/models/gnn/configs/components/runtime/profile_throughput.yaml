@@ -1,5 +1,7 @@
 trainer:
   init:
+    loop:
+      eval_frequency: null
     model:
       task:
         compute_eval_metrics: False
