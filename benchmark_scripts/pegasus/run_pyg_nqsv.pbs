@@ -72,7 +72,7 @@ case "$PYG_RUN_PROFILE" in
         ;;
 esac
 
-CONFIG_PATH="src/cerebras/modelzoo/models/gnn/configs/${CONFIG_PREFIX}_pyg_${PYG_RUN_PROFILE}.yaml"
+CONFIG_PATH="src/cerebras/modelzoo/models/gnn/configs/${CONFIG_PREFIX}_${PYG_RUN_PROFILE}.yaml"
 
 case "$PYG_NO_COMPILE" in
     1|true|TRUE|yes|YES)

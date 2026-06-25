@@ -9,14 +9,14 @@ You can run the script normally with `uv run`. This uses a single GPU (or CPU).
 
 ```bash
 uv run src/cerebras/modelzoo/models/gnn/pyg_graphsage.py \
-    --config src/cerebras/modelzoo/models/gnn/configs/params_graphsage_ogbn_arxiv_pyg_throughput_nocache.yaml
+    --config src/cerebras/modelzoo/models/gnn/configs/params_graphsage_ogbn_arxiv_throughput_nocache.yaml
 ```
 
 For GCN comparison runs, use the full-graph configs:
 
 ```bash
 uv run src/cerebras/modelzoo/models/gnn/pyg_gcn.py \
-    --config src/cerebras/modelzoo/models/gnn/configs/params_gcn_ogbn_arxiv_pyg_throughput_nocache.yaml
+    --config src/cerebras/modelzoo/models/gnn/configs/params_gcn_ogbn_arxiv_throughput_nocache.yaml
 ```
 
 ### Multi-GPU (Distributed Data Parallel - DDP)

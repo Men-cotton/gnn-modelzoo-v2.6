@@ -345,7 +345,10 @@ def _resolve_split(split_idx, split_name):
 
 def _make_full_graph_loader(data, node_idx, loader_cfg):
     if loader_cfg.get("drop_last_batch", False):
-        raise ValueError("full_graph PyG loader does not support drop_last_batch=True.")
+        print(
+            "[loader] full_graph PyG loader overrides drop_last_batch=True to False."
+        )
+        loader_cfg["drop_last_batch"] = False
 
     graph = Data(
         x=data.x,

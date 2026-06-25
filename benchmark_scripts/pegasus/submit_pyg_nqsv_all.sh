@@ -16,7 +16,7 @@ usage() {
     cat <<EOF
 Usage: $(basename "$0") [--dry-run] [--no-compile]
 
-Submits the eight PyG configs supported by run_pyg_nqsv.pbs.
+Submits the eight Pegasus GPU benchmark configs supported by run_pyg_nqsv.pbs.
 Hardware info is collected once through a separate GPU PBS job.
 Set PYG_NO_COMPILE=1 or pass --no-compile to disable torch.compile.
 EOF
@@ -78,7 +78,7 @@ submit_job() {
     local benchmark="$1"
     local profile="$2"
     local config_prefix="$3"
-    local config_path="${configs_dir}/${config_prefix}_pyg_${profile}.yaml"
+    local config_path="${configs_dir}/${config_prefix}_${profile}.yaml"
     local vars="PYG_BENCHMARK=${benchmark},PYG_RUN_PROFILE=${profile},PYG_NO_COMPILE=${no_compile}"
 
     if [[ ! -f "${config_path}" ]]; then

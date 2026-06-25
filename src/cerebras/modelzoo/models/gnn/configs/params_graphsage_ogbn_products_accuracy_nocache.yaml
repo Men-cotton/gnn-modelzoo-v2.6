@@ -6,4 +6,4 @@ extends:
 
 trainer:
   init:
-    model_dir: "$MODELZOO_ROOT/../../../model_dirs/ogbn_products_graphsage_pyg_accuracy_nocache"
+    model_dir: "$MODELZOO_ROOT/../../../model_dirs/ogbn_products_graphsage_accuracy_nocache"

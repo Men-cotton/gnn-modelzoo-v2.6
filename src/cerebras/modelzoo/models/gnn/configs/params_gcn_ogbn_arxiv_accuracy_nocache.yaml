@@ -1,10 +1,9 @@
 extends:
   - params_gcn_ogbn_arxiv.yaml
-  - components/architectures/input_pipelines/pyg_full_graph.yaml
   - components/runtime/amp.yaml
   - components/runtime/profile_accuracy.yaml
   - components/runtime/cache_disabled.yaml
 
 trainer:
   init:
-    model_dir: "$MODELZOO_ROOT/../../../model_dirs/ogbn_arxiv_gcn_pyg_accuracy_nocache"
+    model_dir: "$MODELZOO_ROOT/../../../model_dirs/ogbn_arxiv_gcn_accuracy_nocache"

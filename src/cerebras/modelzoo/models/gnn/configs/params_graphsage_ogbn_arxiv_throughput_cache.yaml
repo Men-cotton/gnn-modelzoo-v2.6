@@ -2,8 +2,8 @@ extends:
   - params_graphsage_ogbn_arxiv.yaml
   - components/architectures/input_pipelines/neighbor.yaml
   - components/runtime/profile_throughput.yaml
-  - components/runtime/cache_disabled.yaml
+  - components/runtime/cache_enabled.yaml
 
 trainer:
   init:
-    model_dir: "$MODELZOO_ROOT/../../../model_dirs/ogbn_arxiv_graphsage_pyg_throughput_nocache"
+    model_dir: "$MODELZOO_ROOT/../../../model_dirs/ogbn_arxiv_graphsage_throughput_cache"

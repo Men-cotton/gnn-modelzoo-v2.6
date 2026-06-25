@@ -29,8 +29,8 @@ CONFIG_PATHS=(
     "configs/params_graphsage_ogbn_arxiv_accuracy.yaml"
     "configs/params_graphsage_ogbn_products.yaml"
     "configs/params_graphsage_ogbn_products_accuracy.yaml"
-    "configs/params_graphsage_ogbn_arxiv_pyg_throughput_cache.yaml"
-    "configs/params_graphsage_ogbn_products_pyg_throughput_cache.yaml"
+    "configs/params_graphsage_ogbn_arxiv_throughput_cache.yaml"
+    "configs/params_graphsage_ogbn_products_throughput_cache.yaml"
 )
 
 usage() {
