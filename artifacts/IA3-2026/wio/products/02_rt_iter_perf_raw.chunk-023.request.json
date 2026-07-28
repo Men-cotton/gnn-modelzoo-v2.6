@@ -1,0 +1,27 @@
+{
+  "from": "2026-06-16T17:29:08.000Z",
+  "queries": [
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "P8E80F9AEF21F6940"
+      },
+      "expr": "{wsjob=\"wsjob-s4ghbzereuamjqqdqtzg7w\", metric=\"rt_iter_perf\"} | json",
+      "format": "logs",
+      "intervalMs": 30000,
+      "maxDataPoints": 5000,
+      "maxLines": 5000,
+      "queryType": "range",
+      "refId": "A"
+    }
+  ],
+  "range": {
+    "from": "2026-06-16T17:29:08.000Z",
+    "raw": {
+      "from": "2026-06-16T17:29:08.000Z",
+      "to": "2026-06-16T17:32:26.000Z"
+    },
+    "to": "2026-06-16T17:32:26.000Z"
+  },
+  "to": "2026-06-16T17:32:26.000Z"
+}

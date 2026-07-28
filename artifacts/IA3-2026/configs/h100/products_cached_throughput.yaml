@@ -1,0 +1,9 @@
+extends:
+  - params_graphsage_ogbn_products.yaml
+  - components/architectures/input_pipelines/neighbor.yaml
+  - components/runtime/pyg_profile_throughput.yaml
+  - components/runtime/pyg_cache_enabled.yaml
+
+trainer:
+  init:
+    model_dir: "$MODELZOO_ROOT/../../../model_dirs/ogbn_products_graphsage_pyg_throughput_cache"

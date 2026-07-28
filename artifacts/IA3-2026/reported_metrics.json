@@ -1,0 +1,44 @@
+{
+  "normalized_empty_queue_fraction": {
+    "ogbn-arxiv": {
+      "median_percent": 2.4,
+      "records": 4179
+    },
+    "ogbn-products": {
+      "median_percent": 2.4,
+      "records": 8400
+    }
+  },
+  "training_loop_throughput_samples_per_s": {
+    "ogbn-arxiv": {
+      "cached": {
+        "CS-3": 1241,
+        "H100": 163179
+      },
+      "uncached": {
+        "CS-3": 1212,
+        "H100": 115261
+      }
+    },
+    "ogbn-products": {
+      "cached": {
+        "CS-3": 591,
+        "H100": 27548
+      },
+      "uncached": {
+        "CS-3": 593,
+        "H100": 18410
+      }
+    }
+  },
+  "validation_accuracy": {
+    "ogbn-arxiv": {
+      "CS-3": 0.7046,
+      "H100": 0.6931
+    },
+    "ogbn-products": {
+      "CS-3": 0.8956,
+      "H100": 0.8915
+    }
+  }
+}

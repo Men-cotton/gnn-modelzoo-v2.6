@@ -1,0 +1,138 @@
+{
+  "results": {
+    "A": {
+      "frames": [
+        {
+          "data": {
+            "values": [
+              [],
+              [],
+              [],
+              [],
+              []
+            ]
+          },
+          "schema": {
+            "fields": [
+              {
+                "name": "labels",
+                "type": "other",
+                "typeInfo": {
+                  "frame": "json.RawMessage"
+                }
+              },
+              {
+                "name": "Time",
+                "type": "time",
+                "typeInfo": {
+                  "frame": "time.Time"
+                }
+              },
+              {
+                "name": "Line",
+                "type": "string",
+                "typeInfo": {
+                  "frame": "string"
+                }
+              },
+              {
+                "name": "tsNs",
+                "type": "string",
+                "typeInfo": {
+                  "frame": "string"
+                }
+              },
+              {
+                "name": "id",
+                "type": "string",
+                "typeInfo": {
+                  "frame": "string"
+                }
+              }
+            ],
+            "meta": {
+              "custom": {
+                "frameType": "LabeledTimeValues"
+              },
+              "executedQueryString": "Expr: {wsjob=\"wsjob-dw436fv2uoch2jqzzmfvco\", metric=\"rt_iter_perf\"} | json",
+              "stats": [
+                {
+                  "displayName": "Summary: bytes processed per second",
+                  "unit": "Bps",
+                  "value": 0
+                },
+                {
+                  "displayName": "Summary: lines processed per second",
+                  "value": 0
+                },
+                {
+                  "displayName": "Summary: total bytes processed",
+                  "unit": "decbytes",
+                  "value": 0
+                },
+                {
+                  "displayName": "Summary: total lines processed",
+                  "value": 0
+                },
+                {
+                  "displayName": "Summary: exec time",
+                  "unit": "s",
+                  "value": 0.001935
+                },
+                {
+                  "displayName": "Ingester: total reached",
+                  "value": 0
+                },
+                {
+                  "displayName": "Ingester: total chunks matched",
+                  "value": 0
+                },
+                {
+                  "displayName": "Ingester: total batches",
+                  "value": 0
+                },
+                {
+                  "displayName": "Ingester: total lines sent",
+                  "value": 0
+                },
+                {
+                  "displayName": "Ingester: head chunk bytes",
+                  "unit": "decbytes",
+                  "value": 0
+                },
+                {
+                  "displayName": "Ingester: head chunk lines",
+                  "value": 0
+                },
+                {
+                  "displayName": "Ingester: decompressed bytes",
+                  "unit": "decbytes",
+                  "value": 0
+                },
+                {
+                  "displayName": "Ingester: decompressed lines",
+                  "value": 0
+                },
+                {
+                  "displayName": "Ingester: compressed bytes",
+                  "unit": "decbytes",
+                  "value": 0
+                },
+                {
+                  "displayName": "Ingester: total duplicates",
+                  "value": 0
+                }
+              ],
+              "typeVersion": [
+                0,
+                0
+              ]
+            },
+            "refId": "A"
+          }
+        }
+      ],
+      "status": 200
+    }
+  }
+}

@@ -1,0 +1,223 @@
+[pbs] PYG_BENCHMARK=graphsage_ogbn_arxiv
+[pbs] PYG_RUN_PROFILE=throughput_cache
+[pbs] PYG_NO_COMPILE=0
+[pbs] CONFIG_PATH=src/cerebras/modelzoo/models/gnn/configs/params_graphsage_ogbn_arxiv_pyg_throughput_cache.yaml
+[pbs] PBS_JOBID=<redacted>
+[pbs] PBS_O_WORKDIR=$REPO_ROOT
+[pbs] hostname=<compute-node>
+2026-06-22 17:51:44 [INFO] Loading CUDA module: cuda
+2026-06-22 17:51:44 [INFO] CUDA module loaded: cuda
+2026-06-22 17:51:44 [INFO] CUDA toolkit root: /system/apps/ubuntu/22.04-202604/cuda/13.0.2
+2026-06-22 17:51:44 [INFO] nvcc: Build cuda_13.0.r13.0/compiler.36424714_0
+2026-06-22 17:51:45 [INFO] Starting PyG GNN run
+2026-06-22 17:51:45 [INFO] Checking for conflicting environment modules
+2026-06-22 17:51:45 [INFO] Module 'intelpython/2022.3.1' is loaded. Attempting to unload...
+2026-06-22 17:51:45 [INFO] 'intelpython/2022.3.1' unloaded successfully.
+2026-06-22 17:51:45 [INFO] Loading CUDA toolkit module for production GPU run
+2026-06-22 17:51:45 [INFO] Loading CUDA module: cuda
+2026-06-22 17:51:45 [INFO] CUDA module loaded: cuda
+2026-06-22 17:51:45 [INFO] CUDA toolkit root: /system/apps/ubuntu/22.04-202604/cuda/13.0.2
+2026-06-22 17:51:45 [INFO] nvcc: Build cuda_13.0.r13.0/compiler.36424714_0
+2026-06-22 17:51:45 [INFO] Run metadata: script=run_pyg.sh
+2026-06-22 17:51:45 [INFO] Run metadata: python_script=src/cerebras/modelzoo/models/gnn/pyg_graphsage.py
+2026-06-22 17:51:45 [INFO] Run metadata: project_root=$REPO_ROOT
+2026-06-22 17:51:45 [INFO] Run metadata: config=src/cerebras/modelzoo/models/gnn/configs/params_graphsage_ogbn_arxiv_pyg_throughput_cache.yaml
+2026-06-22 17:51:45 [INFO] Run metadata: no_compile=0
+2026-06-22 17:51:45 [INFO] Run metadata: hostname=<compute-node>
+2026-06-22 17:51:45 [INFO] Run metadata: CUDA_HOME=/system/apps/ubuntu/22.04-202604/cuda/13.0.2
+2026-06-22 17:51:45 [INFO] Run metadata: CUDA_TOOLKIT_ROOT_DIR=/system/apps/ubuntu/22.04-202604/cuda/13.0.2
+2026-06-22 17:51:45 [INFO] Run metadata: PYTHONPATH=$REPO_ROOT/src
+2026-06-22 17:51:45 [INFO] Run metadata: git_commit=8d1457914cfb8edfad40734500c663a483d13d90
+2026-06-22 17:51:45 [INFO] Run metadata: git_status_short_begin
+ M src/cerebras/modelzoo/models/gnn/configs/components/architectures/input_pipelines/neighbor.yaml
+?? benchmark_scripts/hwinfo/
+?? logs.zip
+?? logs/
+?? src/cerebras/modelzoo/models/gnn/docs/artifacts/
+?? src/gnn_modelzoo_v2_6.egg-info/
+2026-06-22 17:51:45 [INFO] Run metadata: git_status_short_end
+2026-06-22 17:51:45 [INFO] Run metadata: nvidia-smi_begin
+Mon Jun 22 17:51:45 2026
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.95.05              Driver Version: 580.95.05      CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100 PCIe               On  |   00000000:16:00.0 Off |                    0 |
+| N/A   31C    P0             48W /  350W |       0MiB /  81559MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+2026-06-22 17:51:45 [INFO] Run metadata: nvidia-smi_end
+2026-06-22 17:51:45 [INFO] Run metadata: nvcc_begin
+nvcc: NVIDIA (R) Cuda compiler driver
+Copyright (c) 2005-2025 NVIDIA Corporation
+Built on Wed_Aug_20_01:58:59_PM_PDT_2025
+Cuda compilation tools, release 13.0, V13.0.88
+Build cuda_13.0.r13.0/compiler.36424714_0
+2026-06-22 17:51:45 [INFO] Run metadata: nvcc_end
+2026-06-22 17:51:45 [INFO] Run metadata: python_helper_begin
+python_environment_begin
+python=3.11.12
+torch=2.4.0+cu121
+torch_cuda=12.1
+cuda_available=True
+cuda_device_count=1
+cuda_device_0=NVIDIA H100 PCIe
+torch_geometric=2.7.0
+pyg_lib_available=True
+NO_COMPILE=
+requested_no_compile=False
+python_environment_end
+effective_config_begin
+{'model': {'name': 'gnn',
+           'task': {'compute_eval_metrics': False,
+                    'disable_log_softmax': False,
+                    'to_float16': True},
+           'architecture': {'type': 'graphsage',
+                            'hidden_dim': 1024,
+                            'num_layers': 3,
+                            'dropout': 0.5,
+                            'aggregator': 'mean',
+                            'n_feat': 128,
+                            'n_class': 40}},
+ 'precision': {'enabled': True,
+               'fp16_type': 'float16',
+               'loss_scaling_factor': 'dynamic'},
+ 'loop': {'max_steps': 500, 'steps_per_epoch': 20, 'eval_frequency': 20},
+ 'logging': {'log_steps': 20},
+ 'train_dataloader': {'data_processor': 'GNNDataProcessor',
+                      'sampling_mode': 'neighbor',
+                      'fanouts': [15, 10, 5],
+                      'batch_size': 4096,
+                      'drop_last_batch': False,
+                      'num_workers': 40,
+                      'prefetch_factor': 2,
+                      'persistent_workers': True,
+                      'pin_memory': True,
+                      'sampler_seed': 42,
+                      'shuffle': True,
+                      'caching_percent': 1.0,
+                      'split': 'train',
+                      'dataset_profiles': {'ogbn_arxiv': {'dataset_name': 'ogbn-arxiv',
+                                                          'data_dir': '$MODELZOO_ROOT/models/gnn/data/datasets',
+                                                          'pad_node_id': 0}},
+                      'dataset': 'ogbn_arxiv'},
+ 'val_dataloader': {'data_processor': 'GNNDataProcessor',
+                    'sampling_mode': 'neighbor',
+                    'fanouts': [15, 10, 5],
+                    'batch_size': 4096,
+                    'drop_last_batch': False,
+                    'num_workers': 40,
+                    'prefetch_factor': 2,
+                    'persistent_workers': True,
+                    'pin_memory': True,
+                    'sampler_seed': 42,
+                    'shuffle': False,
+                    'split': 'valid',
+                    'dataset_profiles': {'ogbn_arxiv': {'dataset_name': 'ogbn-arxiv',
+                                                        'data_dir': '$MODELZOO_ROOT/models/gnn/data/datasets',
+                                                        'pad_node_id': 0}},
+                    'dataset': 'ogbn_arxiv'}}
+effective_config_end
+2026-06-22 17:53:32 [INFO] Run metadata: python_helper_end
+2026-06-22 17:53:32 [INFO] Executing model script in: $REPO_ROOT
+2026-06-22 17:53:32 [INFO] Executing: uv run src/cerebras/modelzoo/models/gnn/pyg_graphsage.py --config src/cerebras/modelzoo/models/gnn/configs/params_graphsage_ogbn_arxiv_pyg_throughput_cache.yaml
+[ddp] Single-process mode: device=cuda
+[Info] Running in Single-Process mode (CPU or Single GPU).
+[Info] Device: cuda
+[GraphCache] Caching 169343 / 169343 nodes (100.0%) on cuda...
+[GraphCache] Moving features to GPU...
+[GraphCache] Layout complete. Cached features size: torch.Size([169343, 128])
+[Step=0020] Wall=18.9595s | Loss=4.6814
+[Profile] Avg ms/step | Load: 0.872 (Prep: 0.039, Struc: 0.408, Fetch: 0.425) | Fwd: 8.546 | Bwd: 9.754 | Opt: 0.493 | GPU_Tot: 19.627
+[Throughput] Samples: 207285.18 samples/s (207277.41) | Edges: 21973750.97 edges/s (21973627.32)
+[Step=0040] Wall=19.4498s | Loss=2.4698
+[Profile] Avg ms/step | Load: 4.352 (Prep: 3.582, Struc: 0.341, Fetch: 0.430) | Fwd: 8.413 | Bwd: 9.600 | Opt: 0.484 | GPU_Tot: 19.268
+[Throughput] Samples: 173874.90 samples/s (179157.71) | Edges: 18595999.83 edges/s (19130246.91)
+[Step=0060] Wall=19.9478s | Loss=1.9139
+[Profile] Avg ms/step | Load: 5.219 (Prep: 4.465, Struc: 0.321, Fetch: 0.433) | Fwd: 8.375 | Bwd: 9.560 | Opt: 0.488 | GPU_Tot: 19.178
+[Throughput] Samples: 167185.45 samples/s (166429.60) | Edges: 17887691.88 edges/s (17797619.13)
+[Step=0080] Wall=20.4411s | Loss=1.6407
+[Profile] Avg ms/step | Load: 5.528 (Prep: 4.789, Struc: 0.310, Fetch: 0.430) | Fwd: 8.357 | Bwd: 9.544 | Opt: 0.486 | GPU_Tot: 19.127
+[Throughput] Samples: 164909.58 samples/s (162235.02) | Edges: 17642613.40 edges/s (17351091.03)
+[Step=0100] Wall=20.9337s | Loss=1.4646
+[Profile] Avg ms/step | Load: 5.695 (Prep: 4.963, Struc: 0.305, Fetch: 0.427) | Fwd: 8.347 | Bwd: 9.537 | Opt: 0.481 | GPU_Tot: 19.097
+[Throughput] Samples: 163726.56 samples/s (160710.17) | Edges: 17520964.12 edges/s (17204190.58)
+[Step=0120] Wall=21.4219s | Loss=1.3521
+[Profile] Avg ms/step | Load: 5.751 (Prep: 5.023, Struc: 0.302, Fetch: 0.426) | Fwd: 8.346 | Bwd: 9.536 | Opt: 0.480 | GPU_Tot: 19.090
+[Throughput] Samples: 163243.56 samples/s (160941.08) | Edges: 17482574.28 edges/s (17268757.88)
+[Step=0140] Wall=21.9219s | Loss=1.3008
+[Profile] Avg ms/step | Load: 5.884 (Prep: 5.160, Struc: 0.299, Fetch: 0.425) | Fwd: 8.342 | Bwd: 9.534 | Opt: 0.480 | GPU_Tot: 19.080
+[Throughput] Samples: 162302.78 samples/s (158755.18) | Edges: 17382859.13 edges/s (17018946.36)
+[Step=0160] Wall=22.3129s | Loss=1.2615
+[Profile] Avg ms/step | Load: 5.197 (Prep: 4.477, Struc: 0.297, Fetch: 0.422) | Fwd: 8.368 | Bwd: 9.566 | Opt: 0.476 | GPU_Tot: 19.130
+[Throughput] Samples: 167503.85 samples/s (189229.17) | Edges: 17922084.22 edges/s (20176003.15)
+[Step=0180] Wall=22.8540s | Loss=1.2322
+[Profile] Avg ms/step | Load: 5.610 (Prep: 4.894, Struc: 0.296, Fetch: 0.421) | Fwd: 8.362 | Bwd: 9.560 | Opt: 0.474 | GPU_Tot: 19.112
+[Throughput] Samples: 164572.74 samples/s (162895.35) | Edges: 17609833.44 edges/s (17406972.02)
+[Step=0200] Wall=23.3316s | Loss=1.1936
+[Profile] Avg ms/step | Load: 5.596 (Prep: 4.881, Struc: 0.295, Fetch: 0.420) | Fwd: 8.359 | Bwd: 9.557 | Opt: 0.474 | GPU_Tot: 19.104
+[Throughput] Samples: 164586.02 samples/s (163977.96) | Edges: 17615680.96 edges/s (17562257.32)
+[Step=0220] Wall=23.8122s | Loss=1.1929
+[Profile] Avg ms/step | Load: 5.603 (Prep: 4.890, Struc: 0.293, Fetch: 0.420) | Fwd: 8.355 | Bwd: 9.552 | Opt: 0.473 | GPU_Tot: 19.094
+[Throughput] Samples: 164496.94 samples/s (163781.16) | Edges: 17607432.53 edges/s (17542310.45)
+[Step=0240] Wall=24.3055s | Loss=1.1587
+[Profile] Avg ms/step | Load: 5.663 (Prep: 4.950, Struc: 0.293, Fetch: 0.420) | Fwd: 8.352 | Bwd: 9.550 | Opt: 0.473 | GPU_Tot: 19.087
+[Throughput] Samples: 164046.33 samples/s (161172.59) | Edges: 17560960.00 edges/s (17268054.62)
+[Step=0260] Wall=24.7791s | Loss=1.1479
+[Profile] Avg ms/step | Load: 5.635 (Prep: 4.922, Struc: 0.292, Fetch: 0.420) | Fwd: 8.349 | Bwd: 9.546 | Opt: 0.473 | GPU_Tot: 19.081
+[Throughput] Samples: 164207.88 samples/s (164128.42) | Edges: 17577116.19 edges/s (17566971.55)
+[Step=0280] Wall=25.2483s | Loss=1.1350
+[Profile] Avg ms/step | Load: 5.594 (Prep: 4.881, Struc: 0.292, Fetch: 0.420) | Fwd: 8.347 | Bwd: 9.544 | Opt: 0.474 | GPU_Tot: 19.077
+[Throughput] Samples: 164455.72 samples/s (166231.97) | Edges: 17604340.66 edges/s (17798878.85)
+[Step=0300] Wall=25.7676s | Loss=1.1264
+[Profile] Avg ms/step | Load: 5.731 (Prep: 5.020, Struc: 0.291, Fetch: 0.420) | Fwd: 8.345 | Bwd: 9.543 | Opt: 0.473 | GPU_Tot: 19.072
+[Throughput] Samples: 163491.65 samples/s (157363.04) | Edges: 17503077.26 edges/s (16862543.32)
+[Step=0320] Wall=26.1581s | Loss=1.1085
+[Profile] Avg ms/step | Load: 5.408 (Prep: 4.698, Struc: 0.291, Fetch: 0.419) | Fwd: 8.357 | Bwd: 9.557 | Opt: 0.472 | GPU_Tot: 19.096
+[Throughput] Samples: 165936.04 samples/s (188820.07) | Edges: 17756042.66 edges/s (20121720.18)
+[Step=0340] Wall=26.6981s | Loss=1.0966
+[Profile] Avg ms/step | Load: 5.605 (Prep: 4.896, Struc: 0.291, Fetch: 0.418) | Fwd: 8.355 | Bwd: 9.555 | Opt: 0.471 | GPU_Tot: 19.089
+[Throughput] Samples: 164556.03 samples/s (162920.55) | Edges: 17609812.14 edges/s (17412854.65)
+[Step=0360] Wall=27.1792s | Loss=1.0969
+[Profile] Avg ms/step | Load: 5.607 (Prep: 4.898, Struc: 0.291, Fetch: 0.419) | Fwd: 8.354 | Bwd: 9.552 | Opt: 0.472 | GPU_Tot: 19.087
+[Throughput] Samples: 164494.04 samples/s (163251.20) | Edges: 17604238.34 edges/s (17472527.89)
+[Step=0380] Wall=27.6922s | Loss=1.0778
+[Profile] Avg ms/step | Load: 5.695 (Prep: 4.986, Struc: 0.290, Fetch: 0.418) | Fwd: 8.353 | Bwd: 9.551 | Opt: 0.473 | GPU_Tot: 19.085
+[Throughput] Samples: 163852.79 samples/s (157298.74) | Edges: 17537215.80 edges/s (16851473.25)
+[Step=0400] Wall=28.1676s | Loss=1.0682
+[Profile] Avg ms/step | Load: 5.678 (Prep: 4.969, Struc: 0.290, Fetch: 0.419) | Fwd: 8.352 | Bwd: 9.549 | Opt: 0.474 | GPU_Tot: 19.084
+[Throughput] Samples: 163932.62 samples/s (162178.68) | Edges: 17546796.79 edges/s (17376640.42)
+[Step=0420] Wall=28.6855s | Loss=1.0698
+[Profile] Avg ms/step | Load: 5.767 (Prep: 5.058, Struc: 0.290, Fetch: 0.419) | Fwd: 8.351 | Bwd: 9.547 | Opt: 0.474 | GPU_Tot: 19.081
+[Throughput] Samples: 163302.76 samples/s (155989.96) | Edges: 17480154.31 edges/s (16712587.61)
+[Step=0440] Wall=29.2268s | Loss=1.0625
+[Profile] Avg ms/step | Load: 5.902 (Prep: 5.194, Struc: 0.290, Fetch: 0.418) | Fwd: 8.350 | Bwd: 9.547 | Opt: 0.473 | GPU_Tot: 19.078
+[Throughput] Samples: 162372.16 samples/s (149582.42) | Edges: 17382251.94 edges/s (16037434.11)
+[Step=0460] Wall=29.6081s | Loss=1.0507
+[Profile] Avg ms/step | Load: 5.671 (Prep: 4.964, Struc: 0.289, Fetch: 0.418) | Fwd: 8.349 | Bwd: 9.546 | Opt: 0.472 | GPU_Tot: 19.074
+[Throughput] Samples: 163915.64 samples/s (183599.77) | Edges: 17548904.44 edges/s (19688652.17)
+[Step=0480] Wall=30.1349s | Loss=1.0465
+[Profile] Avg ms/step | Load: 5.748 (Prep: 5.041, Struc: 0.289, Fetch: 0.418) | Fwd: 8.357 | Bwd: 9.555 | Opt: 0.473 | GPU_Tot: 19.092
+[Throughput] Samples: 163526.42 samples/s (166747.20) | Edges: 17500828.48 edges/s (17782032.17)
+[Step=0500] Wall=30.6411s | Loss=1.0418
+[Profile] Avg ms/step | Load: 5.795 (Prep: 5.088, Struc: 0.289, Fetch: 0.418) | Fwd: 8.357 | Bwd: 9.554 | Opt: 0.473 | GPU_Tot: 19.091
+[Throughput] Samples: 163179.23 samples/s (159926.18) | Edges: 17465346.86 edges/s (17113719.29)
+------------------------------------------------------------
+Training Completed. Total Steps: 500 (Active: 490)
+Avg Breakdown (ms): Load=5.795 [Prep:5.088, Struc:0.289, Fetch:0.418], Fwd=8.357, Bwd=9.554, Opt=0.473
+------------------------------------------------------------
+Checkpoint saved: $REPO_ROOT/src/cerebras/modelzoo/../../../model_dirs/ogbn_arxiv_graphsage_pyg_throughput_cache/last.pt
+2026-06-22 17:57:59 [INFO] Model execution finished.
+2026-06-22 17:57:59 [INFO] Model execution process completed successfully.
+2026-06-22 17:57:59 [INFO] run_pyg.sh finished successfully.

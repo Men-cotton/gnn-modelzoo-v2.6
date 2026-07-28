@@ -1,0 +1,279 @@
+{
+  "artifact": "IA3-2026",
+  "branch_base_revision": "c834f2e511e869bfe32a1f3b602952da5674c3c4",
+  "configs": [
+    {
+      "public_path": "configs/cs3/arxiv_accuracy_trainer_params.yaml",
+      "public_sha256": "f7dac0cddcbd3487fe08df90306e589ec9397318ca05ddbc2107c37f254288fd",
+      "source": "artifacts/model_dirs/ogbn_arxiv_graphsage_accuracy/20260624_190727/trainer_params.yaml",
+      "source_sha256": "5ddcf00456e724adcf3a45d115d2427237f785964173e165fc4bbe7bc8550286",
+      "system": "CS-3"
+    },
+    {
+      "public_path": "configs/cs3/products_accuracy_trainer_params.yaml",
+      "public_sha256": "2c016b29871328209037bdbb12181fb374c54ef2dacb2ca2ffa071b762c556f5",
+      "source": "artifacts/model_dirs/ogbn_products_graphsage_accuracy/20260628_041034/trainer_params.yaml",
+      "source_sha256": "a1413436dc34cc8166c8772b5f79e29d331747466bae38c133ddffbac01d85fe",
+      "system": "CS-3"
+    },
+    {
+      "public_path": "configs/cs3/arxiv_cached_throughput_trainer_params.yaml",
+      "public_sha256": "812aa4693925c9f1cd8ae987937988245d6fe9d497d652aa61e1a7c268a3ccdc",
+      "source": "artifacts/model_dirs/ogbn_arxiv_graphsage_throughput_cache/20260624_141307/trainer_params.yaml",
+      "source_sha256": "19c4e94ba7dec553e451c166e9387876444249c4cd63d169f0eedcdcfbd23db0",
+      "system": "CS-3"
+    },
+    {
+      "public_path": "configs/cs3/products_cached_throughput_trainer_params.yaml",
+      "public_sha256": "49bc62de6503031ed1b1190eb36d318c2226fb2bfdd2c6b24e75a75f6f569949",
+      "source": "artifacts/model_dirs/ogbn_products_graphsage_throughput_cache/20260624_151908/trainer_params.yaml",
+      "source_sha256": "112d556acc322f9ec99ea5c1a36518067fa172a8fe71a49fbdcddad00cdc92f6",
+      "system": "CS-3"
+    },
+    {
+      "public_path": "configs/cs3/arxiv_uncached_throughput_trainer_params.yaml",
+      "public_sha256": "f53fdac81ca1600efab53508ed849a9b9af8c859a09fff3bb1912a1ef3de4d57",
+      "source": "artifacts/model_dirs/ogbn_arxiv_graphsage/cerebras_logs/20260616_142904/trainer_params.yaml",
+      "source_sha256": "e1a9f83e39cd8f0f0eb3d27d96ab8d48af72da3402057724ce7baf2f09150109",
+      "system": "CS-3"
+    },
+    {
+      "public_path": "configs/cs3/products_uncached_throughput_trainer_params.yaml",
+      "public_sha256": "8bd3bfc4ca1e4d85131479071adfa1419e4dc26e7402eee18565e9d56284b572",
+      "source": "artifacts/model_dirs/ogbn_products_graphsage/cerebras_logs/20260616_152437/trainer_params.yaml",
+      "source_sha256": "8a89854cdaf5bcde628071487925b438ea55906c06f647647416b145479e22cd",
+      "system": "CS-3"
+    },
+    {
+      "public_path": "configs/h100/arxiv_accuracy.yaml",
+      "public_sha256": "0608efce2d74973b6a3a73100215c29b835cdda2c6f23be98aebba91af551df8",
+      "source": "src/cerebras/modelzoo/models/gnn/configs/params_graphsage_ogbn_arxiv_pyg_accuracy_nocache.yaml",
+      "source_revision": "8d1457914cfb8edfad40734500c663a483d13d90",
+      "source_sha256": "0608efce2d74973b6a3a73100215c29b835cdda2c6f23be98aebba91af551df8",
+      "system": "H100"
+    },
+    {
+      "public_path": "configs/h100/arxiv_cached_throughput.yaml",
+      "public_sha256": "30e587f48b7739f8da02feaa569fcc0e531791690db36969247425eb7d00eaad",
+      "source": "src/cerebras/modelzoo/models/gnn/configs/params_graphsage_ogbn_arxiv_pyg_throughput_cache.yaml",
+      "source_revision": "8d1457914cfb8edfad40734500c663a483d13d90",
+      "source_sha256": "30e587f48b7739f8da02feaa569fcc0e531791690db36969247425eb7d00eaad",
+      "system": "H100"
+    },
+    {
+      "public_path": "configs/h100/arxiv_uncached_throughput.yaml",
+      "public_sha256": "0d77b657747fd5f6e45241fa3419b4731da36530846f13fe0b17bdf84f60eb76",
+      "source": "src/cerebras/modelzoo/models/gnn/configs/params_graphsage_ogbn_arxiv_pyg_throughput_nocache.yaml",
+      "source_revision": "8d1457914cfb8edfad40734500c663a483d13d90",
+      "source_sha256": "0d77b657747fd5f6e45241fa3419b4731da36530846f13fe0b17bdf84f60eb76",
+      "system": "H100"
+    },
+    {
+      "public_path": "configs/h100/products_accuracy.yaml",
+      "public_sha256": "ae3648da0609d74caaa26ee7a0d9a103f9ee1d003bbf1efd8f3444dbbe62f627",
+      "source": "src/cerebras/modelzoo/models/gnn/configs/params_graphsage_ogbn_products_pyg_accuracy_nocache.yaml",
+      "source_revision": "8d1457914cfb8edfad40734500c663a483d13d90",
+      "source_sha256": "ae3648da0609d74caaa26ee7a0d9a103f9ee1d003bbf1efd8f3444dbbe62f627",
+      "system": "H100"
+    },
+    {
+      "public_path": "configs/h100/products_cached_throughput.yaml",
+      "public_sha256": "259a48cc10069a445c3f48234bf2eb445750b252d4101deabadca859a2041b2a",
+      "source": "src/cerebras/modelzoo/models/gnn/configs/params_graphsage_ogbn_products_pyg_throughput_cache.yaml",
+      "source_revision": "8d1457914cfb8edfad40734500c663a483d13d90",
+      "source_sha256": "259a48cc10069a445c3f48234bf2eb445750b252d4101deabadca859a2041b2a",
+      "system": "H100"
+    },
+    {
+      "public_path": "configs/h100/products_uncached_throughput.yaml",
+      "public_sha256": "47c3e08ac07b0f28ff57a904c8919da5f3569b8edb210b700a8178831efb274b",
+      "source": "src/cerebras/modelzoo/models/gnn/configs/params_graphsage_ogbn_products_pyg_throughput_nocache.yaml",
+      "source_revision": "8d1457914cfb8edfad40734500c663a483d13d90",
+      "source_sha256": "47c3e08ac07b0f28ff57a904c8919da5f3569b8edb210b700a8178831efb274b",
+      "system": "H100"
+    }
+  ],
+  "h100_run_revision": "8d1457914cfb8edfad40734500c663a483d13d90",
+  "logs": [
+    {
+      "dataset": "ogbn-arxiv",
+      "public": "arxiv_graphsage_1gpu_accuracy_eval.log",
+      "public_path": "logs/arxiv_graphsage_1gpu_accuracy_eval.log",
+      "public_sha256": "754621f45fcc65ee287ecb0955ac460961813ce9239f35d687e1a43a968ccd14",
+      "result": "validation_accuracy",
+      "run_id": null,
+      "source": "arxiv_graphsage_1gpu_not_eval.log",
+      "source_sha256": "bc0b4e208807e7658702ab9d0f43259be57c2ceae19c17092c68b96e2ec2b6f4",
+      "system": "H100"
+    },
+    {
+      "dataset": "ogbn-arxiv",
+      "public": "arxiv_graphsage_wse_accuracy_eval.log",
+      "public_path": "logs/arxiv_graphsage_wse_accuracy_eval.log",
+      "public_sha256": "5e3cc39c648c180a8aa97f58c31025014c30eeee3300b4c2fcd3eed5974a3958",
+      "result": "validation_accuracy",
+      "run_id": "wsjob-mswfcbcppuzmiuapx9psr6",
+      "source": "arxiv_graphsage_wse_accuracy_eval.log",
+      "source_sha256": "b3a22342cbc11d5a8a43f6ca0673acc6166366dc9ee5d7cb878099eaa375e98f",
+      "system": "CS-3"
+    },
+    {
+      "dataset": "ogbn-products",
+      "public": "products_graphsage_1gpu_accuracy_eval.log",
+      "public_path": "logs/products_graphsage_1gpu_accuracy_eval.log",
+      "public_sha256": "87a9c743ed4d6a04214bff35e4eb24e780077713369e9ce8c2932bd5ce3de9c9",
+      "result": "validation_accuracy",
+      "run_id": null,
+      "source": "products_graphsage_1gpu_not_eval.log",
+      "source_sha256": "833e82a9b067fac8186a3ead33828cdef74fc198668ac904d24961e71ef7a70e",
+      "system": "H100"
+    },
+    {
+      "dataset": "ogbn-products",
+      "public": "products_graphsage_wse_accuracy_eval.log",
+      "public_path": "logs/products_graphsage_wse_accuracy_eval.log",
+      "public_sha256": "39dddbc63ade313e2575ca0f0ec2c13043d01bb86a517504497eb2a3d57494d7",
+      "result": "validation_accuracy",
+      "run_id": "wsjob-ndve7gpbywsrd33jccuxnb",
+      "source": "products_graphsage_wse_accuracy_eval.log",
+      "source_sha256": "4531594fa059f5f651fb1c457977c8583e57df54feb5b47b46d9cc57d12c02b4",
+      "system": "CS-3"
+    },
+    {
+      "dataset": "ogbn-arxiv",
+      "public": "arxiv_graphsage_1gpu_cache.log",
+      "public_path": "logs/arxiv_graphsage_1gpu_cache.log",
+      "public_sha256": "dcf4db95d503616c0eaec9b5d9a776e74bb50bcbf103140a4391f713fa138adc",
+      "result": "cached_throughput",
+      "run_id": null,
+      "source": "arxiv_graphsage_1gpu_cache.log",
+      "source_sha256": "7e0df45c66e3db5a0349902747d9541fbd2e8681075228b740a861f6da269723",
+      "system": "H100"
+    },
+    {
+      "dataset": "ogbn-arxiv",
+      "public": "arxiv_graphsage_wse_cache.log",
+      "public_path": "logs/arxiv_graphsage_wse_cache.log",
+      "public_sha256": "58d4176e412d20d19e2c2e83e8db3f55e5bfe800bbe69abbcd4fba58994d1dcb",
+      "result": "cached_throughput",
+      "run_id": "wsjob-v7j6tkhq7nfcrdburs7sui",
+      "source": "arxiv_graphsage_wse_cache.log",
+      "source_sha256": "e15e361b7107e4e57522e6cf6f5328216b673db669bc79dca7fb16591a8b45dd",
+      "system": "CS-3"
+    },
+    {
+      "dataset": "ogbn-products",
+      "public": "products_graphsage_1gpu_cache.log",
+      "public_path": "logs/products_graphsage_1gpu_cache.log",
+      "public_sha256": "cf6d98cf5cea2714c7cff812e2381376629ba99b0834c60efc5fae7d4dab603f",
+      "result": "cached_throughput",
+      "run_id": null,
+      "source": "products_graphsage_1gpu_cache.log",
+      "source_sha256": "6b932bc2fcb08062458734f059b04622c166b857e01e6273b6d9f635f7b1f656",
+      "system": "H100"
+    },
+    {
+      "dataset": "ogbn-products",
+      "public": "products_graphsage_wse_cache.log",
+      "public_path": "logs/products_graphsage_wse_cache.log",
+      "public_sha256": "532c7cf7771806a16e27757f492525f8bac2cd69c131598960f1378c66c5d188",
+      "result": "cached_throughput",
+      "run_id": "wsjob-kqpue4uyt2s3wobgpkpw2c",
+      "source": "products_graphsage_wse_cache.log",
+      "source_sha256": "3f132b5c9c5e7d636a31248a3e26c0bd6763d2048a43b746b7475e406dbee1f1",
+      "system": "CS-3"
+    },
+    {
+      "dataset": "ogbn-arxiv",
+      "public": "arxiv_graphsage_1gpu_not.log",
+      "public_path": "logs/arxiv_graphsage_1gpu_not.log",
+      "public_sha256": "e5ede33e87006dc7ad81fc157a3547a75f955a147f22eb325e9bc7b95b243bc4",
+      "result": "uncached_throughput",
+      "run_id": null,
+      "source": "arxiv_graphsage_1gpu_not.log",
+      "source_sha256": "e19461310444f85d553fe3f7b507187ef19171f57836cb8da0c7e7a9c9069d39",
+      "system": "H100"
+    },
+    {
+      "dataset": "ogbn-arxiv",
+      "public": "arxiv_graphsage_wse_not.log",
+      "public_path": "logs/arxiv_graphsage_wse_not.log",
+      "public_sha256": "52618b49ae1f91109b4065c2d7eeb272e6d4e9116d14572b8c2fccab7d09d001",
+      "result": "uncached_throughput",
+      "run_id": "wsjob-dw436fv2uoch2jqzzmfvco",
+      "source": "arxiv_graphsage_wse_not2.log",
+      "source_sha256": "04fcfebb884efc602a6ebcec4e1b92df8ac0ef6db6798bfc495265fb7fb73990",
+      "system": "CS-3"
+    },
+    {
+      "dataset": "ogbn-products",
+      "public": "products_graphsage_1gpu_not.log",
+      "public_path": "logs/products_graphsage_1gpu_not.log",
+      "public_sha256": "d5fc4a3f28aec86d54929fb24b0d658255fe9757fcc9ba3dcaf6a06c7d358082",
+      "result": "uncached_throughput",
+      "run_id": null,
+      "source": "products_graphsage_1gpu_not.log",
+      "source_sha256": "cd937d727ae0eed18baf6fc48f4b83bf94679329313b13a91605ac751964c5f5",
+      "system": "H100"
+    },
+    {
+      "dataset": "ogbn-products",
+      "public": "products_graphsage_wse_not.log",
+      "public_path": "logs/products_graphsage_wse_not.log",
+      "public_sha256": "99dc6b1ed26d9ff898b7ff6ba777d4d58432896ae1b6f4e47a039cdcb15d44bc",
+      "result": "uncached_throughput",
+      "run_id": "wsjob-s4ghbzereuamjqqdqtzg7w",
+      "source": "products_graphsage_wse_not.log",
+      "source_sha256": "2291fe50e3f02a0a6cba66290bb5b492b17310d8c8ae377e4a437dee85eb7f8b",
+      "system": "CS-3"
+    }
+  ],
+  "sanitization": {
+    "logs_and_configs": [
+      "ALCF user and absolute repository paths",
+      "compute-node hostnames and PBS job identifiers",
+      "internal Cerebras dashboard URLs, workdirs, and namespace"
+    ],
+    "wio_request_response_chunks": "none; copied byte for byte after credential and private-path scan"
+  },
+  "schema_version": 1,
+  "wio": {
+    "allocated_activation_wios": 103,
+    "normalization": "input_empty_wio_us / 83 / iteration_us",
+    "records": [
+      {
+        "activation_rows": 4221,
+        "captured_jsonl_sha256": "7915dde5c926211f66055770cffb84273d77a7008db4342a72c2644e6118b749",
+        "complete_activation_rows": 4179,
+        "dataset": "ogbn-arxiv",
+        "from": "2026-06-16T14:37:56.000Z",
+        "job_id": "wsjob-dw436fv2uoch2jqzzmfvco",
+        "public_path": "wio/arxiv",
+        "query": "{wsjob=\"wsjob-dw436fv2uoch2jqzzmfvco\", metric=\"rt_iter_perf\"} | json",
+        "query_manifest": "query_manifest.json",
+        "raw_files": 18,
+        "raw_rows": 4824,
+        "reconstructed_jsonl_sha256": "7915dde5c926211f66055770cffb84273d77a7008db4342a72c2644e6118b749",
+        "source_dir": "artifacts/grafana_dumps/20260617/wsjob-dw436fv2uoch2jqzzmfvco/raw_loki_chunked",
+        "to": "2026-06-16T15:22:30.000Z"
+      },
+      {
+        "activation_rows": 8421,
+        "captured_jsonl_sha256": "8d4ca57fc99e8e7e7573c8f5266549bc76ba0e1be3c9a6f33b33825c2a5d0e6e",
+        "complete_activation_rows": 8400,
+        "dataset": "ogbn-products",
+        "from": "2026-06-16T15:34:08.000Z",
+        "job_id": "wsjob-s4ghbzereuamjqqdqtzg7w",
+        "public_path": "wio/products",
+        "query": "{wsjob=\"wsjob-s4ghbzereuamjqqdqtzg7w\", metric=\"rt_iter_perf\"} | json",
+        "query_manifest": "query_manifest.json",
+        "raw_files": 48,
+        "raw_rows": 9624,
+        "reconstructed_jsonl_sha256": "8d4ca57fc99e8e7e7573c8f5266549bc76ba0e1be3c9a6f33b33825c2a5d0e6e",
+        "source_dir": "artifacts/grafana_dumps/20260617/wsjob-s4ghbzereuamjqqdqtzg7w/raw_loki_chunked",
+        "to": "2026-06-16T17:32:26.000Z"
+      }
+    ],
+    "saturatable_activation_wios": 83
+  }
+}

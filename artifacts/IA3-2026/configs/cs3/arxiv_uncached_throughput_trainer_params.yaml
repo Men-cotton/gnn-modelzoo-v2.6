@@ -1,0 +1,363 @@
+trainer:
+  init:
+    model:
+      name: gnn
+      architecture:
+        type: graphsage
+        n_feat: 128
+        n_class: 40
+        hidden_dim: 1024
+        num_layers: 3
+        dropout: 0.5
+        aggregator: mean
+      task:
+        to_float16: true
+        disable_log_softmax: false
+        compute_eval_metrics: false
+    device: null
+    backend:
+      backend_type: CSX
+      compile_dir: compile_dir_20260616
+      cluster_config:
+        python_paths:
+        - $REPO_ROOT/src/cerebras/modelzoo/../..
+    model_dir: $REPO_ROOT/src/cerebras/modelzoo/models/gnn/docs/artifacts/runtime/model_dirs/ogbn_arxiv_graphsage
+    optimizer:
+      AdamW:
+        params: []
+        lr: 0.003
+        betas:
+        - 0.9
+        - 0.999
+        eps: 1.0e-06
+        weight_decay: 0.0005
+        correct_bias: true
+        amsgrad: false
+    schedulers: null
+    precision:
+      enabled: true
+      fp16_type: float16
+      precision_opt_level: null
+      loss_scaling_factor: dynamic
+      initial_loss_scale: null
+      steps_per_increase: 2000
+      min_loss_scale: null
+      max_loss_scale: null
+      max_gradient_norm: null
+      max_gradient_value: null
+      log_loss_scale: null
+    sparsity: null
+    loop:
+      num_steps: null
+      max_steps: 500
+      num_epochs: null
+      steps_per_epoch: 20
+      eval_frequency: null
+      eval_steps: null
+      grad_accum_steps: 1
+    checkpoint: null
+    logging:
+      log_steps: 20
+      log_level: INFO
+      wsc_log_level: null
+      enable_act_frequency: false
+    callbacks:
+    - CheckLoss: {}
+    - LogOptimizerParamGroup:
+        keys: lr
+    - ComputeNorm: {}
+    - ModelEvalMetrics: {}
+    - RateProfiler: {}
+    - DurationProfiler: {}
+    - FlopUtilization: {}
+    - SavePerformanceData: {}
+    - DumpAvailableTensorNames: {}
+    - ModelZooParamsMetadata:
+        params:
+          trainer:
+            init:
+              seed: 42
+              model:
+                name: gnn
+                task:
+                  compute_eval_metrics: false
+                  disable_log_softmax: false
+                  to_float16: true
+                architecture:
+                  type: graphsage
+                  hidden_dim: 1024
+                  num_layers: 3
+                  dropout: 0.5
+                  aggregator: mean
+                  n_feat: 128
+                  n_class: 40
+              optimizer:
+                AdamW:
+                  params: []
+                  weight_decay: 0.0005
+                  learning_rate: 0.003
+              precision:
+                enabled: true
+                fp16_type: float16
+                loss_scaling_factor: dynamic
+              model_dir: $MODELZOO_ROOT/models/gnn/docs/artifacts/runtime/model_dirs/ogbn_arxiv_graphsage
+              loop:
+                max_steps: 500
+                steps_per_epoch: 20
+                eval_frequency: null
+              logging:
+                log_steps: 20
+              callbacks: []
+              loggers: []
+              backend:
+                backend_type: CSX
+                compile_dir: compile_dir_20260616
+                cluster_config:
+                  python_paths:
+                  - $REPO_ROOT/src/cerebras/modelzoo/../..
+            fit:
+              train_dataloader:
+                data_processor: GNNDataProcessor
+                sampling_mode: neighbor
+                fanouts:
+                - 15
+                - 10
+                - 5
+                batch_size: 4096
+                drop_last_batch: false
+                num_workers: 40
+                prefetch_factor: 2
+                persistent_workers: true
+                pin_memory: true
+                sampler_seed: 42
+                shuffle: true
+                caching_percent: null
+                split: train
+                dataset_profiles:
+                  ogbn_arxiv:
+                    dataset_name: ogbn-arxiv
+                    data_dir: $MODELZOO_ROOT/models/gnn/data/datasets
+                    pad_node_id: 0
+                dataset: ogbn_arxiv
+              val_dataloader:
+                data_processor: GNNDataProcessor
+                sampling_mode: neighbor
+                fanouts:
+                - 15
+                - 10
+                - 5
+                batch_size: 4096
+                drop_last_batch: false
+                num_workers: 40
+                prefetch_factor: 2
+                persistent_workers: true
+                pin_memory: true
+                sampler_seed: 42
+                shuffle: false
+                split: valid
+                dataset_profiles:
+                  ogbn_arxiv:
+                    dataset_name: ogbn-arxiv
+                    data_dir: $MODELZOO_ROOT/models/gnn/data/datasets
+                    pad_node_id: 0
+                dataset: ogbn_arxiv
+            validate:
+              val_dataloader:
+                data_processor: GNNDataProcessor
+                sampling_mode: neighbor
+                fanouts:
+                - 15
+                - 10
+                - 5
+                batch_size: 4096
+                drop_last_batch: false
+                num_workers: 40
+                prefetch_factor: 2
+                persistent_workers: true
+                pin_memory: true
+                sampler_seed: 42
+                shuffle: false
+                split: valid
+                dataset_profiles:
+                  ogbn_arxiv:
+                    dataset_name: ogbn-arxiv
+                    data_dir: $MODELZOO_ROOT/models/gnn/data/datasets
+                    pad_node_id: 0
+                dataset: ogbn_arxiv
+            validate_all:
+              val_dataloaders:
+              - data_processor: GNNDataProcessor
+                sampling_mode: neighbor
+                fanouts:
+                - 15
+                - 10
+                - 5
+                batch_size: 4096
+                drop_last_batch: false
+                num_workers: 40
+                prefetch_factor: 2
+                persistent_workers: true
+                pin_memory: true
+                sampler_seed: 42
+                shuffle: false
+                split: valid
+                dataset_profiles:
+                  ogbn_arxiv:
+                    dataset_name: ogbn-arxiv
+                    data_dir: $MODELZOO_ROOT/models/gnn/data/datasets
+                    pad_node_id: 0
+                dataset: ogbn_arxiv
+    - SamplesStreamedInfo: {}
+    loggers:
+    - ProgressLogger: {}
+    - TensorBoardLogger:
+        summary_dir: null
+        legacy_event_dirs: false
+    - TelemetryLogger:
+        max_buffer_size: 128
+        max_buffer_seconds: 150
+    seed: 42
+    autorestart: null
+  fit:
+    train_dataloader:
+      data_processor: GNNDataProcessor
+      dataset_name: ogbn-arxiv
+      dataset: ogbn_arxiv
+      dataset_profiles:
+        ogbn_arxiv:
+          dataset_name: ogbn-arxiv
+          data_dir: $MODELZOO_ROOT/models/gnn/data/datasets
+          pad_node_id: 0
+      data_dir: $REPO_ROOT/src/cerebras/modelzoo/models/gnn/data/datasets
+      sampling_mode: neighbor
+      fanouts:
+      - 15
+      - 10
+      - 5
+      caching_percent: null
+      sampler_seed: 42
+      batch_size: 4096
+      drop_last: false
+      num_workers: 40
+      shuffle: true
+      prefetch_factor: 2
+      persistent_workers: true
+      pin_memory: true
+      static_batch_cache_size: 0
+      split: train
+      adj_normalization: null
+      adjacency_format: auto
+      sparse_matmul_max_degree: null
+      use_fake_data: false
+      fake_data_seed: null
+      fake_n_feat: 128
+      fake_n_class: 7
+      fake_num_nodes: 200
+      pad_node_id: 0
+    val_dataloader:
+    - data_processor: GNNDataProcessor
+      dataset_name: ogbn-arxiv
+      dataset: ogbn_arxiv
+      dataset_profiles:
+        ogbn_arxiv:
+          dataset_name: ogbn-arxiv
+          data_dir: $MODELZOO_ROOT/models/gnn/data/datasets
+          pad_node_id: 0
+      data_dir: $REPO_ROOT/src/cerebras/modelzoo/models/gnn/data/datasets
+      sampling_mode: neighbor
+      fanouts:
+      - 15
+      - 10
+      - 5
+      caching_percent: null
+      sampler_seed: 42
+      batch_size: 4096
+      drop_last: false
+      num_workers: 40
+      shuffle: false
+      prefetch_factor: 2
+      persistent_workers: true
+      pin_memory: true
+      static_batch_cache_size: 0
+      split: valid
+      adj_normalization: null
+      adjacency_format: auto
+      sparse_matmul_max_degree: null
+      use_fake_data: false
+      fake_data_seed: null
+      fake_n_feat: 128
+      fake_n_class: 7
+      fake_num_nodes: 200
+      pad_node_id: 0
+  validate:
+    val_dataloader:
+      data_processor: GNNDataProcessor
+      dataset_name: ogbn-arxiv
+      dataset: ogbn_arxiv
+      dataset_profiles:
+        ogbn_arxiv:
+          dataset_name: ogbn-arxiv
+          data_dir: $MODELZOO_ROOT/models/gnn/data/datasets
+          pad_node_id: 0
+      data_dir: $REPO_ROOT/src/cerebras/modelzoo/models/gnn/data/datasets
+      sampling_mode: neighbor
+      fanouts:
+      - 15
+      - 10
+      - 5
+      caching_percent: null
+      sampler_seed: 42
+      batch_size: 4096
+      drop_last: false
+      num_workers: 40
+      shuffle: false
+      prefetch_factor: 2
+      persistent_workers: true
+      pin_memory: true
+      static_batch_cache_size: 0
+      split: valid
+      adj_normalization: null
+      adjacency_format: auto
+      sparse_matmul_max_degree: null
+      use_fake_data: false
+      fake_data_seed: null
+      fake_n_feat: 128
+      fake_n_class: 7
+      fake_num_nodes: 200
+      pad_node_id: 0
+  validate_all:
+    val_dataloaders:
+    - data_processor: GNNDataProcessor
+      dataset_name: ogbn-arxiv
+      dataset: ogbn_arxiv
+      dataset_profiles:
+        ogbn_arxiv:
+          dataset_name: ogbn-arxiv
+          data_dir: $MODELZOO_ROOT/models/gnn/data/datasets
+          pad_node_id: 0
+      data_dir: $REPO_ROOT/src/cerebras/modelzoo/models/gnn/data/datasets
+      sampling_mode: neighbor
+      fanouts:
+      - 15
+      - 10
+      - 5
+      caching_percent: null
+      sampler_seed: 42
+      batch_size: 4096
+      drop_last: false
+      num_workers: 40
+      shuffle: false
+      prefetch_factor: 2
+      persistent_workers: true
+      pin_memory: true
+      static_batch_cache_size: 0
+      split: valid
+      adj_normalization: null
+      adjacency_format: auto
+      sparse_matmul_max_degree: null
+      use_fake_data: false
+      fake_data_seed: null
+      fake_n_feat: 128
+      fake_n_class: 7
+      fake_num_nodes: 200
+      pad_node_id: 0
